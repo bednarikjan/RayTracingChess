@@ -2,7 +2,7 @@
 class Camera
 {
 public:
-	Camera(void);
-	~Camera(void);
+	Camera(void) { }
+	~Camera(void) { }
 };
 

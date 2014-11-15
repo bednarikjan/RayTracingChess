@@ -79,20 +79,14 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Ray.h" />
+    <ClInclude Include="RayTracer.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Exception.cpp" />
-    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="rtchess.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Shape.cpp" />
-    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

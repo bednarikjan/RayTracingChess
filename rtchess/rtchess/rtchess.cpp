@@ -28,17 +28,9 @@ int main(int argc, char** argv)
 	scene.loadModel(modelFile);
 
 	// Set camera
-	scene.setCamera(Vector<double>(0.0, 0.0, 10.0), Vector<double>(1.0, 1.0, -1.0), 640, 480);
+	scene.setCamera(Vector(0.0, 0.0, 10.0), Vector(1.0, 1.0, -1.0), 640, 480);
 
-	// DEBUG - testing vector operations
-	Vector<double> v1(2.0, 3.5, 7.8);
-	Vector<double> v2(3.0, 7.1, 0.2);
-
-	Vector<double> v3;
-	v3 = v1 + v2;
-
-	//cout << "v3 = (" << v3.x_ << ", " << v3.y_ << ", " << v3.z_ << ")" << endl;
-	cout << v3 << endl;
+	// 
 
 	return 0;
 }

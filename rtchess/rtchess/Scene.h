@@ -8,19 +8,28 @@ class Scene
 {
 public:
 	//! Constructor
-	Scene(void);
+	Scene(void) { }
 	
 	//! Destructor
-	~Scene(void);
+	~Scene(void) { }
 
 	//! Loads model from file
 	void loadModel(string fileName);
 
 	//! Sets cameraposition and projection screen size
-	void setCamera(Vector<double> position, Vector<double> direction, unsigned screenWidth, unsigned screenHeight);
+	void setCamera(Vector position, Vector direction, unsigned screenWidth, unsigned screenHeight);
 
 private:
 	Camera camera;
 
 };
 
+inline void Scene::loadModel(string fileName) 
+{
+
+}
+
+inline void Scene::setCamera(Vector position, Vector direction, unsigned screenWidth, unsigned screenHeight)
+{
+
+}

@@ -2,7 +2,7 @@
 class Shape
 {
 public:
-	Shape(void);
-	~Shape(void);
+	Shape(void) { }
+	~Shape(void) { }
 };
 

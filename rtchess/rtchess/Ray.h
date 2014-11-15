@@ -1,9 +1,9 @@
 
 #include "vector.h"
 class Ray :
-	public Vector<double>
+	public Vector
 {
 public:
-	Ray(void);
-	~Ray(void);
+	Ray(void) { }
+	~Ray(void) { }
 };
