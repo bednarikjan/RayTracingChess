@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _SHAPE_H_
+#define _SHAPE_H_
+
 class Shape
 {
 public:
@@ -6,3 +8,4 @@ public:
 	~Shape(void) { }
 };
 
+#endif

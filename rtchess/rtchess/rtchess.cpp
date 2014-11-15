@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Scene.h"
+#include "RayTracer.h"
 
 using namespace std;
 
@@ -28,9 +29,10 @@ int main(int argc, char** argv)
 	scene.loadModel(modelFile);
 
 	// Set camera
-	scene.setCamera(Vector(0.0, 0.0, 10.0), Vector(1.0, 1.0, -1.0), 640, 480);
+	//scene.setCamera(Vector(0.0, 0.0, 10.0), Vector(1.0, 1.0, -1.0), 640, 480);
 
-	// 
+	// Create ray tracer
+	//RayTracer rayTracer;
 
 	return 0;
 }

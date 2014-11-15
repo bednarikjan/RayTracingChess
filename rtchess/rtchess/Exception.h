@@ -1,3 +1,6 @@
+#ifndef _EXCEPTION_H_
+#define _EXCEPTION_H_
+
 class Exception
 {
 public:
@@ -9,3 +12,5 @@ class BadParamsException: public Exception
 {
 
 };
+
+#endif

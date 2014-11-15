@@ -4,6 +4,9 @@ Standard operators +, - are overloaded to implement basic
 operations like vector addition, subtraction
 */
 
+#ifndef _VECTOR_H_
+#define _VECTOR_H_
+
 #include <string>
 #include <cmath>
 
@@ -16,8 +19,9 @@ public:
 	Vector(double x, double y, double z): x_(x), y_(y), z_(z) { }			
 	~Vector(void) { }
 
-	double length();
-	void normalize();
+	double length();		
+
+	Vector& normalize();
 	double dot(Vector& other);
 
 	Vector operator+(Vector& other) {
@@ -49,15 +53,19 @@ inline double Vector::length()
 	return sqrt(x_*x_ + y_*y_ + z_*z_);
 }
 
-inline void Vector::normalize()
+inline Vector& Vector::normalize()
 {
 	double len = length();
 	x_ /= len;
 	y_ /= len;
 	z_ /= len;
+
+	return *this;
 }
 
 inline double Vector::dot(Vector& other)
 {
 	return x_ * other.x_ + y_ * other.y_ + z_ * other.z_;
 }
+
+#endif

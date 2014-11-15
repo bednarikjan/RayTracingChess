@@ -1,3 +1,6 @@
+#ifndef _SCENE_H_
+#define _SCENE_H_
+
 #include <string>
 #include "Camera.h"
 #include "Vector.h"
@@ -8,7 +11,7 @@ class Scene
 {
 public:
 	//! Constructor
-	Scene(void) { }
+	Scene() { }
 	
 	//! Destructor
 	~Scene(void) { }
@@ -17,11 +20,12 @@ public:
 	void loadModel(string fileName);
 
 	//! Sets cameraposition and projection screen size
-	void setCamera(Vector position, Vector direction, unsigned screenWidth, unsigned screenHeight);
+	void setCameraLocation(Vector position, Vector direction);
+	void setCameraResolution(unsigned screenWidth, unsigned screenHeight);
+	void setCameraFieldOfView(double horizontalAngle);
 
 private:
 	Camera camera;
-
 };
 
 inline void Scene::loadModel(string fileName) 
@@ -29,7 +33,21 @@ inline void Scene::loadModel(string fileName)
 
 }
 
-inline void Scene::setCamera(Vector position, Vector direction, unsigned screenWidth, unsigned screenHeight)
+inline void Scene::setCameraLocation(Vector position, Vector direction)
 {
-
+	camera.position = position;
+	//camera.direction = direction.normalize();	
 }
+
+inline void Scene::setCameraResolution(unsigned screenWidth, unsigned screenHeight)
+{
+	camera.screenWidth = screenWidth;
+	camera.screenHeight = screenHeight;
+}
+
+inline void Scene::setCameraFieldOfView(double horizontalAngle)
+{
+	camera.fieldOfView = horizontalAngle;
+}
+
+#endif
