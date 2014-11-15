@@ -5,15 +5,27 @@
 
 class Camera
 {
-public:	
-	Camera() { }
+public:		
+	//! Constructor
+	Camera(Vector position, Vector direction, 
+			unsigned screenWidth, unsigned screenHeight, 
+			double fieldOfView) : 
+			position_(position), direction_(direction),
+			screenWidth_(screenWidth), screenHeight_(screenHeight),
+			fieldOfView_(fieldOfView) 
+	{ 
+		// TODO Calculate projection plane distance			
+
+	}
+	
+	//! Destructor
 	~Camera() { }
 	
-	Vector position;
-	Vector direction;
-	unsigned screenWidth;
-	unsigned screenHeight;
-	double fieldOfView;
+	Vector position_;
+	Vector direction_;
+	unsigned screenWidth_;
+	unsigned screenHeight_;
+	double fieldOfView_;
 
 private:
 	double projectionPlaneDistance;
