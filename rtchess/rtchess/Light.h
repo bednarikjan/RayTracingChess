@@ -1,13 +1,13 @@
 #ifndef _LIGHT_H_
 #define _LIGHT_H_
 
-#include "Vector.h"
+#include "Vector3d.h"
 #include "Shape.h"
 
 class Light: public Sphere
 {
 public:	
-	Light(Vector& position, double radius): Sphere(position, radius) { }
+	Light(Vector3d& position, double radius): Sphere(position, radius) { }
 	~Light() {  }
 };
 

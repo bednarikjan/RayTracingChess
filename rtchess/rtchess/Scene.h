@@ -3,7 +3,7 @@
 
 #include <string>
 #include "Camera.h"
-#include "Vector.h"
+#include "Vector3d.h"
 #include "RayTracer.h"
 #include "Model.h"
 #include "Light.h"
@@ -16,8 +16,8 @@ public:
 	//! Constructor
 	Scene(string& fileName) 
 	{ 
-		Camera camera(Vector(0.0, 0.0, 10.0), Vector(1.0, 1.0, -1.0), 640, 480, 100);
-		Light light(Vector(10.0, 10.0, 10.0), 2.0);
+		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 640, 480, 100);
+		Light light(Vector3d(10.0, 10.0, 10.0), 2.0);
 		loadModel(fileName);
 		rayTracer = new RayTracer(camera, light, model);
 	}
@@ -31,11 +31,11 @@ public:
 	//! Destructor
 	~Scene(void) 
 	{
-		//delete model;
+		delete model;
 		delete rayTracer;		
 	}	
 
-	void setCameraLocation(Vector position, Vector direction) 
+	void setCameraLocation(Vector3d position, Vector3d direction) 
 	{
 		rayTracer->camera_->position_ = position;
 		rayTracer->camera_->direction_ = direction;			
@@ -43,16 +43,15 @@ public:
 
 	void setCameraResolution(unsigned screenWidth, unsigned screenHeight)
 	{
-		rayTracer->camera_->screenWidth_ = screenWidth;
-		rayTracer->camera_->screenHeight_ = screenHeight;
+		rayTracer->camera_->setResolution(screenWidth, screenHeight);		
 	}
 
 	void setCameraFieldOfView(double horizontalAngle)
 	{
-		rayTracer->camera_->fieldOfView_ = horizontalAngle;	
+		rayTracer->camera_->setFieldOfView(horizontalAngle);	
 	}
 	
-	void setLightPosition(Vector position)
+	void setLightPosition(Vector3d position)
 	{
 		rayTracer->light_->center_ = position;
 	}
@@ -83,8 +82,8 @@ inline void Scene::loadModel(string fileName)
 {
 	// DEBUG
 	cout << "Loading model " << fileName << endl;
-	// TODO - check if model is properly loaded - not NULL!
-	model = NULL;
+	
+	model = new Model();
 }
 
 inline void Scene::render()
