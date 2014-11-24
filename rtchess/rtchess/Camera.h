@@ -4,7 +4,7 @@
 #include "Vector3d.h"
 
 #define PI 3.14159265
-#define RAD_2_DG(x) ((x) / 180.0 * PI)
+#define DG_2_RAD(x) ((x) / 180.0 * PI)
 
 //! Class implementing camera for viewing the scene
 /*!
@@ -30,10 +30,10 @@ public:
 	
 	//! Constructor
 	Camera(Vector3d position, Vector3d direction, 
-			unsigned screenWidth, unsigned screenHeight, 
+			unsigned horizontalPixels, unsigned verticalPixels, 
 			double fieldOfView) : 
 			position_(position), direction_(direction),
-			screenWidth_(screenWidth), screenHeight_(screenHeight),
+			horizontalPixels_(horizontalPixels), verticalPixels_(verticalPixels),
 			fieldOfView_(fieldOfView), screenCenter(Vector3d(0.0, 1.0, 0.0))
 	{ 
 		updatePxStep();
@@ -42,10 +42,10 @@ public:
 	//! Destructor
 	~Camera() { }	
 
-	void setResolution(unsigned screenWidth, unsigned screenHeight)
+	void setResolution(unsigned horizontalPixels, unsigned verticalPixels)
 	{
-		screenWidth_ = screenWidth;
-		screenHeight_ = screenHeight;
+		horizontalPixels_ = horizontalPixels;
+		verticalPixels_ = verticalPixels;
 		updatePxStep();
 	}
 
@@ -61,8 +61,8 @@ public:
 	}
 
 private:
-	unsigned screenWidth_;
-	unsigned screenHeight_;
+	unsigned horizontalPixels_;
+	unsigned verticalPixels_;
 	double fieldOfView_;
 	double pxStep;
 
@@ -72,13 +72,13 @@ private:
 
 inline void Camera::updatePxStep() 
 {
-	pxStep = screenWidth_ / 2.0 / (screenCenter.y_ * tan(RAD_2_DG(fieldOfView_ / 2.0)));		
+	pxStep = screenCenter.y_ * tan(DG_2_RAD(fieldOfView_ / 2.0)) / (horizontalPixels_ / 2.0);	
 }
 
 #endif
 
 // OLD
 /*
-	double projectionScreenDistance = (screenWidth / 2.0) / tan(RAD_2_DG(fieldOfView / 2.0));
+	double projectionScreenDistance = (horizontalPixels / 2.0) / tan(RAD_2_DG(fieldOfView / 2.0));
 	
 */
