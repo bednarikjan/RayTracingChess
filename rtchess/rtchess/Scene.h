@@ -67,7 +67,7 @@ public:
 	//! Save rendered image to .PNG file
 	void saveImage(string& fileName);
 
-//private:	
+private:	
 	RayTracer* rayTracer;
 	Model* model;
 

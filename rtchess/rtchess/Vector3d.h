@@ -20,6 +20,7 @@ class Vector3d
 public:	
 	Vector3d(void) { }
 	Vector3d(double x, double y, double z): x_(x), y_(y), z_(z) { }			
+	Vector3d(double x): x_(x), y_(x), z_(x) { }	
 	~Vector3d(void) { }
 
 	double length();		
@@ -46,9 +47,20 @@ public:
 		return os;
 	}	
 
+	bool operator==(Vector3d& other) {
+		return(almostEqual(x_, other.x_) && 
+			   almostEqual(y_, other.y_) &&
+			   almostEqual(z_, other.z_));
+	}
+
 	double x_;
 	double y_;
 	double z_;	
+
+private:
+	bool almostEqual(double a, double b, double EPSILON = 1e-6) {
+		return fabs(a - b) < EPSILON;
+	}
 };
 
 inline double Vector3d::length()
