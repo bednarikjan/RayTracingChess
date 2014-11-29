@@ -9,30 +9,44 @@ using namespace std;
 #define MIN(a, b) (a) < (b) ? (a) : (b)
 #define MAX(a, b) (a) > (b) ? (a) : (b)
 
+//! Material of the shape. 
+struct Material 
+{
+	Material(Vector3d& color, double reflection, double transparency, double refractiveIndex, double shininess) : 
+		c(color), r(reflection), t(transparency), refIdx(refractiveIndex), sh(shininess) { }
+	Vector3d c;		// RGB, <0.0 - 1.0>
+	double r;		// <0.0 - 1.0>
+	double t;		// <0.0 - 1.0>
+	double refIdx;
+	double sh;
+};
+
 class Shape
 {
-
 public:
-	Shape() { }
+	Shape(Material& mat = Material(Vector3d(0.5, 0.5, 0.5), 0.0, 0.0, 0.0, 4.0)) : mat_(mat) { }
 	~Shape() { }
 
 	//! Calculates coordinates of intersection with given ray.
-	virtual bool intersects(const Ray& ray, Point& intersection, Vector3d& normal) = 0;	
+	virtual bool intersects(const Ray& ray, Point& intersection, Vector3d& normal, double& t) = 0;	
+
+	Material mat_;
 };
 
 class Sphere: public Shape
 {
-public:
-	Sphere(Point& center, double radius): center_(center), radius_(radius) { }
+public:	
+	Sphere(Point& center, double radius, Material& material) : 
+		Shape(material), center_(center), radius_(radius) { }
 	~Sphere() { }
 
-	virtual bool intersects(const Ray& ray, Point& intersection, Vector3d& normal);	
+	virtual bool intersects(const Ray& ray, Point& intersection, Vector3d& normal, double& t);	
 
 	Point center_;
 	double radius_;
 };
 
-inline bool Sphere::intersects(const Ray& ray, Point& intersection, Vector3d& normal)
+inline bool Sphere::intersects(const Ray& ray, Point& intersection, Vector3d& normal, double &t)
 {
 	Point start = ray.getStart();
 	Vector3d dir = ray.getDirection();
@@ -47,8 +61,7 @@ inline bool Sphere::intersects(const Ray& ray, Point& intersection, Vector3d& no
 
 	if(D > 0.0) {
 		double t1 = (-B + sqrt(D)) / (2.0 * A);
-		double t2 = (-B - sqrt(D)) / (2.0 * A);
-		double t;
+		double t2 = (-B - sqrt(D)) / (2.0 * A);		
 
 		// the object is behind the ray
 		if(t1 < 0.0 && t2 < 0.0) {	

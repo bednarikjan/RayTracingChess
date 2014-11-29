@@ -76,7 +76,19 @@ void testVector()
 		string("Vector3d v3 = -v1 + v2;"));	
 
 	// -- test 2 --	
-	Test::assertTrue((-v1 + v2) == v3, string("Wrong implementation of operator=="));	
+	Test::assertTrue((-v1 + v2) == v3, 
+		string("Wrong implementation of operator=="));	
+
+	// -- test 3 --	
+	Test::assertTrue((v1 * v2) == Vector3d(v1.x_ * v2.x_, v1.y_ * v2.y_, v1.z_ * v2.z_), 
+		string("Wrong implementation of operator* for Vector3d"));	
+
+	// -- test 3 --	
+	Test::assertTrue((v1 * -3.5) == Vector3d(v1.x_ * -3.5, v1.y_ * -3.5, v1.z_ * -3.5), 
+		string("Wrong implementation of operator* for double"));	
+
+	Test::assertTrue((-3.5 * v1) == Vector3d(v1.x_ * -3.5, v1.y_ * -3.5, v1.z_ * -3.5), 
+		string("Wrong implementation of operator* for double"));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -94,23 +106,25 @@ void testCamera()
 ////	Sphere
 void testSphere()
 {
+	Material mat(Vector3d(0.5, 0.5, 0.5), 0.0, 0.0, 0.0, 4.0);
+
 	// -- test 1 --	
-	Sphere s1(Point(0.0, 0.0, 0.0), 5.0);
+	Sphere s1(Point(0.0, 0.0, 0.0), 5.0, mat);
 	Ray r1(Point(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, -1.0));
 	
-	Point i1; Vector3d n1;
+	Point i1; Vector3d n1; double t1;
 
-	Test::assertTrue(s1.intersects(r1, i1, n1), string("should intersect"));	
+	Test::assertTrue(s1.intersects(r1, i1, n1, t1), string("should intersect"));	
 	Test::assertTrue(i1 == Point(0.0, 0.0, 5.0), string("wrong intersection point"));					
 	Test::assertTrue(n1 == Vector3d(0.0, 0.0, 1.0).normalize(), string("wrong normal vector"));	
 
 	// -- test 2 --	
-	Sphere s2(Point(0.0, 0.0, 0.0), 5.0);
+	Sphere s2(Point(0.0, 0.0, 0.0), 5.0, mat);
 	Ray r2(Point(1.0, 1.0, 1.0), Vector3d(1.0, 1.0, 1.0));
 	
-	Point i2; Vector3d n2;
+	Point i2; Vector3d n2; double t2;
 
-	Test::assertTrue(s2.intersects(r2, i2, n2), string("should intersect"));	
+	Test::assertTrue(s2.intersects(r2, i2, n2, t2), string("should intersect"));	
 	Test::assertTrue(i2 == Vector3d(5.0 / sqrt(3.0)), string("wrong intersection point"));					
 	Test::assertTrue(n2 == Vector3d(1.0, 1.0, 1.0).normalize(), string("wrong normal vector"));	
 }	

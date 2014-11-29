@@ -185,3 +185,6 @@ FakesAssemblies/
 
 # My test project
 Pokus/
+
+# Output rendered PPM images
+*.ppm

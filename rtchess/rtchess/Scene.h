@@ -2,6 +2,8 @@
 #define _SCENE_H_
 
 #include <string>
+#include <fstream>
+
 #include "Camera.h"
 #include "Vector3d.h"
 #include "RayTracer.h"
@@ -16,23 +18,22 @@ public:
 	//! Constructor
 	Scene(string& fileName) 
 	{ 
-		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 640, 480, 100);
-		Light light(Vector3d(10.0, 10.0, 10.0), 2.0);
-		loadModel(fileName);
-		rayTracer = new RayTracer(camera, light, model);
+		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 1920, 1080, 120);
+		Light light(Vector3d(1.0, 1.0, 1.0), 2.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 4.0));
+		init(fileName, camera, light);
 	}
 
 	Scene(Camera& camera, Light& light, string& fileName)
 	{ 
-		loadModel(fileName);
-		rayTracer = new RayTracer(camera, light, model);
+		init(fileName, camera, light);		
 	}		
 	
 	//! Destructor
 	~Scene(void) 
 	{
 		delete model;
-		delete rayTracer;		
+		delete rayTracer;
+		delete[] image;
 	}	
 
 	void setCameraLocation(Vector3d position, Vector3d direction) 
@@ -68,8 +69,17 @@ public:
 	void saveImage(string& fileName);
 
 private:	
-	RayTracer* rayTracer;
-	Model* model;
+	RayTracer* rayTracer;	//!< ray tracer
+	Model* model;			//!< loaded model (triangle model or spheres)
+	Vector3d *image;		//!< output image (matrix of RGB vectors)
+
+	//! Initalizes teh object
+	void init(string& fileName, Camera& camera, Light& light)
+	{
+		loadModel(fileName);
+		rayTracer = new RayTracer(camera, light, model);
+		image = new Vector3d[camera.getScreenHeight() * camera.getScreenWidth()];
+	}
 
 	//! Loads model from file
 	void loadModel(string fileName);
@@ -90,12 +100,24 @@ inline void Scene::render()
 {
 	// DEBUG
 	cout << "Rendering scene... " << endl;
+
+	rayTracer->render(image);
 }
 
 inline void Scene::saveImage(string &fileName)
 {
 	// DEBUG
 	cout << "Saving rendered image to file " << fileName << endl;
+
+	// Save result to a PPM image
+	ofstream ofs(fileName, std::ios::out | std::ios::binary);
+	ofs << "P6\n" << rayTracer->camera_->getScreenWidth() << " " << rayTracer->camera_->getScreenHeight() << "\n255\n";
+	for (unsigned i = 0; i < rayTracer->camera_->getScreenWidth() * rayTracer->camera_->getScreenHeight(); i++) {
+		ofs <<	(unsigned char)(min(image[i].x_, 1.0) * 255) << 
+				(unsigned char)(min(image[i].y_, 1.0) * 255) << 
+				(unsigned char)(min(image[i].z_, 1.0) * 255);
+	}
+	ofs.close();	
 }
 
 #endif

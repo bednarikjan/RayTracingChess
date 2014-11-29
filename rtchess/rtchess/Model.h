@@ -12,7 +12,7 @@ public:
 	Model()
 	{ 
 		// DEBUG - generate a few spheres
-		shapes.push_back(new Sphere(Vector3d(5.0, 5.0, 5.0), 1.5));
+		shapes.push_back(new Sphere(Vector3d(0.0, 3.0, 0.5), 1.5, Material(Vector3d(0.8, 0.15, 0.15), 0.7, 0.0, 0.0, 4.0)));
 	}
 
 	//! Destructor

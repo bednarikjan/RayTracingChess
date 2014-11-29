@@ -49,11 +49,16 @@ public:
 		updatePxStep();
 	}
 
+	unsigned getScreenWidth() { return horizontalPixels_; }
+	unsigned getScreenHeight() { return verticalPixels_; }
+	 
 	void setFieldOfView(double horizontalAngle) 
 	{
 		fieldOfView_ = horizontalAngle;
 		updatePxStep();
 	}
+
+	double getFieldOfView() { return fieldOfView_; }
 
 	double getPxStep() 
 	{

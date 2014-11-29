@@ -40,6 +40,18 @@ public:
 		return *this + -other;	
 	}
 
+	Vector3d operator*(Vector3d& other) {
+		return Vector3d(x_ * other.x_, y_ * other.y_, z_ * other.z_);
+	}
+
+	friend Vector3d operator*(Vector3d& ours, double other) {
+		return Vector3d(ours.x_ * other, ours.y_ * other, ours.z_ * other);
+	}
+
+	friend Vector3d operator*(double other, Vector3d& ours) {
+		return Vector3d(ours.x_ * other, ours.y_ * other, ours.z_ * other);
+	}
+
 	friend ostream& operator<<(ostream& os, const Vector3d& v) {		
 		os << "(" << v.x_ << ", "
 				  << v.y_ << ", "
