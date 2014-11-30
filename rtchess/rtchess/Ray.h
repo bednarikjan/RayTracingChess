@@ -5,11 +5,11 @@
 class Ray	
 {
 public:
-	Ray(Point& start, Vector3d& direction) : start_(start), direction_(direction) { }
+	Ray(Point& start, Vector3d& direction) : start_(start), direction_(direction.normalize()) { }
 	~Ray(void) { }
 	
-	const Point& getStart() const { return start_; } 
-	const Vector3d& getDirection() const { return direction_; } 
+	Point getStart() const { return start_; } 
+	Vector3d getDir() const { return direction_; } 
 
 private:
 	Point start_;

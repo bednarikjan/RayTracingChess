@@ -8,7 +8,7 @@
 class RayTracer 
 {
 public:
-	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 5): model_(model), maxDepth_(maxDepth)
+	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 3): model_(model), maxDepth_(maxDepth)
 	{ 
 		camera_ = new Camera(camera);
 		light_ = new Light(light);
@@ -29,7 +29,7 @@ public:
 	unsigned maxDepth_;
 
 private:
-	Vector3d trace(Ray& ray, unsigned depth);
+	Vector3d trace(Ray& ray, unsigned depth, bool inside);
 
 	static const double INFINITY;
 };
@@ -38,92 +38,108 @@ const double RayTracer::INFINITY = std::numeric_limits<double>::max();
 
 inline void RayTracer::render(Vector3d* image)
 {
-	// topleft screen pixel position
-	double dx = camera_->getPxStep();
-	Point px = Point(-((camera_->getScreenWidth() / 2.0 - 0.5) * dx), 
-						camera_->screenCenter.y_, 
-					   (camera_->getScreenHeight() / 2.0 - 0.5) * dx);
+	int w = camera_->getScreenWidth();
+	int h = camera_->getScreenHeight();
+	double pxw = camera_->getPxStep();
+
+	// TopLeft screen pixel position	
+	Point pxTL = Point(-((w / 2.0 - 0.5) * pxw), camera_->screenCenter.y_, (h / 2.0 - 0.5) * pxw);
 	
 	// trace ray through each pixel
-	for(int i = 0; i < (int)camera_->getScreenHeight(); i++) 
-	{
-		for(int j = 0; j < (int)camera_->getScreenWidth(); j++) 
-		{
-			Ray ray(camera_->position_, (px + Point(j * dx, 0.0, -i * dx)) - camera_->position_);
-			image[i * camera_->getScreenWidth() + j] = trace(ray, maxDepth_);
+	for(int i = 0; i < h; i++) {
+		for(int j = 0; j < w; j++) {
+			Ray ray(camera_->position_, (pxTL + Point(j * pxw, 0.0, -i * pxw)) - camera_->position_);
+			image[i * w + j] = trace(ray, maxDepth_, false);
 		}
 	}
 }
 
-inline Vector3d RayTracer::trace(Ray& ray, unsigned depth)
+inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 {		
-	double tMin = INFINITY, t;	
-	Point isect, isectClosest;
-	Shape* obj = NULL;
-	Vector3d normal;
-
-	// resulting pixel color
-	Vector3d color;
+	
+	Shape::Intersection is, isC;	// intersection info
+	isC.t = INFINITY;						
+	Vector3d color;					// resulting pixel color
 
 	// find closest intersection	
 	for(int i = 0; i < (int)model_->shapes.size(); i++) {
-		if(model_->shapes.at(i)->intersects(ray, isect, normal, t) && (t < tMin)) {		
-			tMin = t;
-			isectClosest = isect;
-			obj = model_->shapes.at(i);
-		}
+		if(model_->shapes.at(i)->intersects(ray, is) && (is.t < isC.t))
+			isC = is;					
 	}
 
 	// some intersection found
-	if(tMin < INFINITY) {		
+	if(isC.t < INFINITY) {						
 		Vector3d cop(0.0, 0.0, 0.0);	// color of object at the given pixel.
 		Vector3d cr(0.0, 0.0, 0.0);		// color of reflected ray
 		Vector3d ct(0.0, 0.0, 0.0);		// color of refracted ray
 
-		// hack
-		isectClosest = isectClosest + (normal * 0.0001);
-
+		// hack - move interscetion point along a normal vector a bit (double imprecision workaround)
+		Point isectOut(isC.isect + (isC.normal * 0.00001));
+		Point isectIn(isC.isect - (isC.normal * 0.00001));		
+		
 		// cast shadow rays
+		Vector3d lv((light_->center_ - isectOut).normalize());	// vector aiming to light
 		bool illuminated = true;
-		Vector3d lv((light_->center_ - isectClosest).normalize());	// vector aiming to light
-		for(int i = 0; i < (int)model_->shapes.size(); i++) {
-			if(/*model_->shapes.at(i) != obj && */model_->shapes.at(i)->intersects(Ray(isectClosest, lv), isect, normal, t)) {
-				illuminated = false;
-				break;
+		if(inside || lv.dot(isC.normal) < 0.0) {		// inside object or face turned away from light
+			illuminated = false;
+		} else {
+			for(int i = 0; i < (int)model_->shapes.size(); i++) {
+				if(model_->shapes.at(i)->intersects(Ray(isectOut, lv), is)) {
+					illuminated = false;
+					break;
+				}
 			}
 		}
 
 		// evaluate Phong reflection and shading model
+		Vector3d R, V;
+		// TODO - should not be here! move somewhere else - class member perhaps, material?
 		double Ia = 0.0, Id = 0.0, Is = 0.0;
+		double ka = 0.2, kd = 3.5, ks = 5.0;
+		//double ka = 0.0, kd = 3.5, ks = 0.0;		
 		
 		// ambient
-		Ia = 0.4;
+		Ia = ka;
 
-		if(illuminated) {						
+		if(illuminated) {					
 			// diffuse		
-			Id = lv.dot(normal) * 1.5;			
+			Id = lv.dot(isC.normal) * kd;			
 
 			// specular
-			Is = pow((-lv + (normal * (2 * (-lv).dot(normal)))).dot((camera_->position_ - isectClosest).normalize()), obj->mat_.sh) * 0.7;
+			R = -lv + isC.normal * (2 * lv.dot(isC.normal));	// reflected light ray
+			V = (camera_->position_ - isectOut).normalize();	// viewer-intersection ray
+			Is = pow(max(0.0, R.dot(V)), isC.obj->mat_.shininess) * ks;			
 		}
 
-		cop = light_->mat_.c * obj->mat_.c * (Ia + Id + Is);
+		cop = light_->mat_.color * isC.obj->mat_.color * (Ia + Id + Is);
 
 		// reflective object
-		if(obj->mat_.r > 0.0 && depth > 0) {
-			//cr = trace( , depth - 1);
+		if(!inside && isC.obj->mat_.reflection > 0.0 && depth > 0) {
+			cr = trace(Ray(isectOut, ray.getDir() + isC.normal * (2 * (-(ray.getDir())).dot(isC.normal))) , depth - 1, false);
 		}
 
 		// transparent object
-		if(obj->mat_.t > 0.0 && depth > 0) {
-			//ct = trace( , depth - 1);
+		if(isC.obj->mat_.transparency > 0.0 && depth > 0) {
+			double ref = inside ? (1.0 / isC.obj->mat_.refractIdx) : (isC.obj->mat_.refractIdx); // n1 / n2 - ratio of refr. idxs
+			Vector3d normal = inside ? isC.normal : -isC.normal;
+			double cosI = normal.dot(ray.getDir()); // cosine of incident ray
+			Vector3d refrDir(ref * ray.getDir() + (ref * cosI - sqrt(1.0 - ref * ref * (1.0 - cosI * cosI))) * normal);
+			ct = trace(Ray(inside ? isectOut : isectIn, refrDir.normalize()), depth - 1, inside ? false : true);
 		}
 
-		color = obj->mat_.t * ct + (1.0 - obj->mat_.t) * (obj->mat_.r * cr + (1.0 - obj->mat_.r) * cop);
+		if(inside) {
+			color = ct;
+		} else {
+			color = isC.obj->mat_.transparency * ct + 
+				(1.0 - isC.obj->mat_.transparency) * (isC.obj->mat_.reflection * cr + (1.0 - isC.obj->mat_.reflection) * cop);
+		}
 	} 
 	// no intersection
 	else {
-		color = Vector3d(0.5, 0.5, 0.5);	// background color 
+		if(depth == maxDepth_)
+			color = Vector3d(0.25, 0.25, 0.25);	// background color - GRAY
+		else
+			color = Vector3d(0.0, 0.0, 0.0);	// background color - BLACK
 	}
 
 	return color;

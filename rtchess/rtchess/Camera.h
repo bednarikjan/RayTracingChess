@@ -81,9 +81,3 @@ inline void Camera::updatePxStep()
 }
 
 #endif
-
-// OLD
-/*
-	double projectionScreenDistance = (horizontalPixels / 2.0) / tan(RAD_2_DG(fieldOfView / 2.0));
-	
-*/

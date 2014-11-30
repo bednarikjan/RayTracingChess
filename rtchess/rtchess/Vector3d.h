@@ -26,7 +26,7 @@ public:
 	double length();		
 
 	Vector3d& normalize();
-	double dot(Vector3d& other);
+	double dot(Vector3d& other);	
 
 	Vector3d operator+(Vector3d& other) {
 		return Vector3d(x_ + other.x_, y_ + other.y_, z_ + other.z_);

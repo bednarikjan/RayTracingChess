@@ -107,26 +107,23 @@ void testCamera()
 void testSphere()
 {
 	Material mat(Vector3d(0.5, 0.5, 0.5), 0.0, 0.0, 0.0, 4.0);
+	Shape::Intersection isectInfo;
 
 	// -- test 1 --	
 	Sphere s1(Point(0.0, 0.0, 0.0), 5.0, mat);
-	Ray r1(Point(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, -1.0));
-	
-	Point i1; Vector3d n1; double t1;
+	Ray r1(Point(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, -1.0));		
 
-	Test::assertTrue(s1.intersects(r1, i1, n1, t1), string("should intersect"));	
-	Test::assertTrue(i1 == Point(0.0, 0.0, 5.0), string("wrong intersection point"));					
-	Test::assertTrue(n1 == Vector3d(0.0, 0.0, 1.0).normalize(), string("wrong normal vector"));	
+	Test::assertTrue(s1.intersects(r1, isectInfo), string("should intersect"));	
+	Test::assertTrue(isectInfo.isect == Point(0.0, 0.0, 5.0), string("wrong intersection point"));					
+	Test::assertTrue(isectInfo.normal == Vector3d(0.0, 0.0, 1.0).normalize(), string("wrong normal vector"));	
 
 	// -- test 2 --	
 	Sphere s2(Point(0.0, 0.0, 0.0), 5.0, mat);
-	Ray r2(Point(1.0, 1.0, 1.0), Vector3d(1.0, 1.0, 1.0));
-	
-	Point i2; Vector3d n2; double t2;
+	Ray r2(Point(1.0, 1.0, 1.0), Vector3d(1.0, 1.0, 1.0));		
 
-	Test::assertTrue(s2.intersects(r2, i2, n2, t2), string("should intersect"));	
-	Test::assertTrue(i2 == Vector3d(5.0 / sqrt(3.0)), string("wrong intersection point"));					
-	Test::assertTrue(n2 == Vector3d(1.0, 1.0, 1.0).normalize(), string("wrong normal vector"));	
+	Test::assertTrue(s2.intersects(r2, isectInfo), string("should intersect"));	
+	Test::assertTrue(isectInfo.isect == Vector3d(5.0 / sqrt(3.0)), string("wrong intersection point"));					
+	Test::assertTrue(isectInfo.normal == Vector3d(1.0, 1.0, 1.0).normalize(), string("wrong normal vector"));	
 }	
 
 int main(int argc, char** argv) 

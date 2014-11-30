@@ -13,12 +13,12 @@ using namespace std;
 struct Material 
 {
 	Material(Vector3d& color, double reflection, double transparency, double refractiveIndex, double shininess) : 
-		c(color), r(reflection), t(transparency), refIdx(refractiveIndex), sh(shininess) { }
-	Vector3d c;		// RGB, <0.0 - 1.0>
-	double r;		// <0.0 - 1.0>
-	double t;		// <0.0 - 1.0>
-	double refIdx;
-	double sh;
+		color(color), reflection(reflection), transparency(transparency), refractIdx(refractiveIndex), shininess(shininess) { }
+	Vector3d color;			// RGB, <0.0 - 1.0>
+	double reflection;		// <0.0 - 1.0>
+	double transparency;	// <0.0 - 1.0>
+	double refractIdx;
+	double shininess;
 };
 
 class Shape
@@ -27,8 +27,15 @@ public:
 	Shape(Material& mat = Material(Vector3d(0.5, 0.5, 0.5), 0.0, 0.0, 0.0, 4.0)) : mat_(mat) { }
 	~Shape() { }
 
+	struct Intersection {
+		Point isect;
+		Vector3d normal;
+		double t;
+		Shape* obj;
+	};
+
 	//! Calculates coordinates of intersection with given ray.
-	virtual bool intersects(const Ray& ray, Point& intersection, Vector3d& normal, double& t) = 0;	
+	virtual bool intersects(const Ray& ray, Intersection& intersection) = 0;	
 
 	Material mat_;
 };
@@ -40,16 +47,16 @@ public:
 		Shape(material), center_(center), radius_(radius) { }
 	~Sphere() { }
 
-	virtual bool intersects(const Ray& ray, Point& intersection, Vector3d& normal, double& t);	
+	virtual bool intersects(const Ray& ray, Intersection& intersection);	
 
 	Point center_;
 	double radius_;
 };
 
-inline bool Sphere::intersects(const Ray& ray, Point& intersection, Vector3d& normal, double &t)
+inline bool Sphere::intersects(const Ray& ray, Intersection& info)
 {
 	Point start = ray.getStart();
-	Vector3d dir = ray.getDirection();
+	Vector3d dir = ray.getDir();
 	Vector3d s2c = start - center_;
 
 	double A = dir.x_ * dir.x_ + dir.y_ * dir.y_ + dir.z_ * dir.z_;
@@ -68,14 +75,15 @@ inline bool Sphere::intersects(const Ray& ray, Point& intersection, Vector3d& no
 			return false;
 		// inside the speher - one of the intersection points is behind the ray
 		} else if (t1 < 0.0 || t2 < 0.0) {
-			t = MAX(t1, t2);
+			info.t = MAX(t1, t2);
 		// choose closer intersection
 		} else {
-			t = MIN(t1, t2);
+			info.t = MIN(t1, t2);
 		}
 		
-		intersection = Vector3d(start.x_ + dir.x_ * t, start.y_ + dir.y_ * t, start.z_ + dir.z_ * t);
-		normal = (intersection - center_).normalize();	 
+		info.isect = Vector3d(start.x_ + dir.x_ * info.t, start.y_ + dir.y_ * info.t, start.z_ + dir.z_ * info.t);
+		info.normal = (info.isect - center_).normalize();
+		info.obj = this;
 		return true;
 	}
 	return false;	

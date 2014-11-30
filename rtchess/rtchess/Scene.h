@@ -18,8 +18,9 @@ public:
 	//! Constructor
 	Scene(string& fileName) 
 	{ 
-		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 1920, 1080, 120);
-		Light light(Vector3d(1.0, 1.0, 1.0), 2.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 4.0));
+		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 640, 480, 45);
+		Light light(Vector3d(100.0, 40.0, 80.0), 0.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));
+		//Light light(Vector3d(-10.0, 40.0, 10.0), 2.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));
 		init(fileName, camera, light);
 	}
 
