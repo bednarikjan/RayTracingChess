@@ -18,9 +18,8 @@ public:
 	//! Constructor
 	Scene(string& fileName) 
 	{ 
-		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 640, 480, 45);
-		Light light(Vector3d(100.0, 40.0, 80.0), 0.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));
-		//Light light(Vector3d(-10.0, 40.0, 10.0), 2.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));
+		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 1920, 1080, 50);
+		Light light(Vector3d(5.0, -10.0, 5.0), 0.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));		
 		init(fileName, camera, light);
 	}
 
@@ -76,26 +75,13 @@ private:
 
 	//! Initalizes teh object
 	void init(string& fileName, Camera& camera, Light& light)
-	{
-		loadModel(fileName);
+	{		
+		//model = new Model();
+		model = new Model(fileName);
 		rayTracer = new RayTracer(camera, light, model);
-		image = new Vector3d[camera.getScreenHeight() * camera.getScreenWidth()];
-	}
-
-	//! Loads model from file
-	void loadModel(string fileName);
+		image = new Vector3d[camera.getScreenHeight() * camera.getScreenWidth()];		
+	}	
 };
-
-/*!
-Loads model from file
-*/
-inline void Scene::loadModel(string fileName) 
-{
-	// DEBUG
-	cout << "Loading model " << fileName << endl;
-	
-	model = new Model();
-}
 
 inline void Scene::render()
 {

@@ -89,6 +89,13 @@ void testVector()
 
 	Test::assertTrue((-3.5 * v1) == Vector3d(v1.x_ * -3.5, v1.y_ * -3.5, v1.z_ * -3.5), 
 		string("Wrong implementation of operator* for double"));
+
+	// -- test 3 --	cross product
+	Test::assertTrue(v1.cross(v2) == Vector3d(-63.05, -2.32, -11.8), 
+		string("Wrong implementation of cross product"));
+	
+	Test::assertTrue(Vector3d(1.3, 13.5, -7.1).cross(Vector3d(2.6, 27.0, -14.2)) == Vector3d(0.0, 0.0, 0.0), 
+		string("Wrong implementation of cross product"));
 }
 
 ///////////////////////////////////////////////////////////////////////////

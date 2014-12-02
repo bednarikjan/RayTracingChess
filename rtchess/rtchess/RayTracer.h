@@ -8,7 +8,7 @@
 class RayTracer 
 {
 public:
-	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 3): model_(model), maxDepth_(maxDepth)
+	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 0): model_(model), maxDepth_(maxDepth)
 	{ 
 		camera_ = new Camera(camera);
 		light_ = new Light(light);
@@ -46,7 +46,7 @@ inline void RayTracer::render(Vector3d* image)
 	Point pxTL = Point(-((w / 2.0 - 0.5) * pxw), camera_->screenCenter.y_, (h / 2.0 - 0.5) * pxw);
 	
 	// trace ray through each pixel
-	for(int i = 0; i < h; i++) {
+	for(int i = 0; i < h; i++) {		
 		for(int j = 0; j < w; j++) {
 			Ray ray(camera_->position_, (pxTL + Point(j * pxw, 0.0, -i * pxw)) - camera_->position_);
 			image[i * w + j] = trace(ray, maxDepth_, false);
@@ -68,7 +68,7 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 	}
 
 	// some intersection found
-	if(isC.t < INFINITY) {						
+	if(isC.t < INFINITY) {			
 		Vector3d cop(0.0, 0.0, 0.0);	// color of object at the given pixel.
 		Vector3d cr(0.0, 0.0, 0.0);		// color of reflected ray
 		Vector3d ct(0.0, 0.0, 0.0);		// color of refracted ray
@@ -76,12 +76,12 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 		// hack - move interscetion point along a normal vector a bit (double imprecision workaround)
 		Point isectOut(isC.isect + (isC.normal * 0.00001));
 		Point isectIn(isC.isect - (isC.normal * 0.00001));		
-		
+
 		// cast shadow rays
 		Vector3d lv((light_->center_ - isectOut).normalize());	// vector aiming to light
 		bool illuminated = true;
-		if(inside || lv.dot(isC.normal) < 0.0) {		// inside object or face turned away from light
-			illuminated = false;
+		if(inside || lv.dot(isC.normal) < 0.0) {		// inside object or face turned away from light			
+			illuminated = false;			
 		} else {
 			for(int i = 0; i < (int)model_->shapes.size(); i++) {
 				if(model_->shapes.at(i)->intersects(Ray(isectOut, lv), is)) {
@@ -96,12 +96,12 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 		// TODO - should not be here! move somewhere else - class member perhaps, material?
 		double Ia = 0.0, Id = 0.0, Is = 0.0;
 		double ka = 0.2, kd = 3.5, ks = 5.0;
-		//double ka = 0.0, kd = 3.5, ks = 0.0;		
+		//double ka = 0.0, kd = 3.5, ks = 5.0;		
 		
 		// ambient
 		Ia = ka;
 
-		if(illuminated) {					
+		if(illuminated) {		
 			// diffuse		
 			Id = lv.dot(isC.normal) * kd;			
 

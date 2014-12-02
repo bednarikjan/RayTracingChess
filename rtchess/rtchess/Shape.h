@@ -30,7 +30,7 @@ public:
 	struct Intersection {
 		Point isect;
 		Vector3d normal;
-		double t;
+		double t;		
 		Shape* obj;
 	};
 
@@ -89,5 +89,63 @@ inline bool Sphere::intersects(const Ray& ray, Intersection& info)
 	return false;	
 }
 
+class Triangle: public Shape
+{
+public:
+	Triangle(Vector3d v0, Vector3d v1, Vector3d v2, 
+			 Vector3d n0, Vector3d n1, Vector3d n2,
+			 Material& material) : Shape(material), 
+			 v0(v0), v1(v1), v2(v2), n0(n0), n1(n1), n2(n2) { }
+	~Triangle() { }
+
+	virtual bool intersects(const Ray& ray, Intersection& info);	
+
+	Vector3d v0, v1, v2;	
+	Vector3d n0, n1, n2;	
+
+	static const double EPSILON;
+};
+
+const double Triangle::EPSILON = 1e-6;
+
+inline bool Triangle::intersects(const Ray& ray, Intersection& info) {
+	// Find vectors for 2 edges sharing vertex v0
+	Vector3d edge1 = v1 - v0;
+	Vector3d edge2 = v2 - v0;
+
+	// calculate determinant
+	Vector3d pVec = ray.getDir().cross(edge2);
+	double det = edge1.dot(pVec); 	
+
+	// determinant close to 0 => ray parallel to triangle plane
+	if(det < -Triangle::EPSILON || det > Triangle::EPSILON) {		
+		double invDet = 1.0 / det;
+		Vector3d tVec = ray.getStart() - v0;
+
+		// u - first barycentric coordinate
+		double u = tVec.dot(pVec) * invDet;
+		if(u < 0.0 || u > 1.0)
+			return false;
+
+		Vector3d qVec = tVec.cross(edge1);
+
+		// v - second barycentric coordinate
+		double v = ray.getDir().dot(qVec) * invDet;
+		if(v < 0.0 || (u + v) > 1.0)
+			return false;		
+
+		// the triangle is on the oposite side of ray
+		double t = edge2.dot(qVec) * invDet;
+		if(t < 0.0)
+			return false;
+
+		info.t = t;					
+		info.isect = ray.getStart() + info.t * ray.getDir();
+		info.normal = ((1.0 - u - v) * n0 + u * n1 + v * n2).normalize();		
+		info.obj = this;
+		return true;
+	}
+	return false;
+}
 
 #endif

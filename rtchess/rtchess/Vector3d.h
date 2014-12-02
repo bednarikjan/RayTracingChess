@@ -26,7 +26,8 @@ public:
 	double length();		
 
 	Vector3d& normalize();
-	double dot(Vector3d& other);	
+	double dot(Vector3d& other);
+	Vector3d cross(Vector3d& other);
 
 	Vector3d operator+(Vector3d& other) {
 		return Vector3d(x_ + other.x_, y_ + other.y_, z_ + other.z_);
@@ -40,6 +41,7 @@ public:
 		return *this + -other;	
 	}
 
+	//! element-wise multiplication
 	Vector3d operator*(Vector3d& other) {
 		return Vector3d(x_ * other.x_, y_ * other.y_, z_ * other.z_);
 	}
@@ -75,13 +77,11 @@ private:
 	}
 };
 
-inline double Vector3d::length()
-{
+inline double Vector3d::length() {
 	return sqrt(x_*x_ + y_*y_ + z_*z_);
 }
 
-inline Vector3d& Vector3d::normalize()
-{
+inline Vector3d& Vector3d::normalize() {
 	double len = length();
 	x_ /= len;
 	y_ /= len;
@@ -90,9 +90,14 @@ inline Vector3d& Vector3d::normalize()
 	return *this;
 }
 
-inline double Vector3d::dot(Vector3d& other)
-{
+inline double Vector3d::dot(Vector3d& other) {
 	return x_ * other.x_ + y_ * other.y_ + z_ * other.z_;
+}
+
+inline Vector3d Vector3d::cross(Vector3d& other) {
+	return Vector3d(y_ * other.z_ - z_ * other.y_, 
+					z_ * other.x_ - x_ * other.z_, 
+					x_ * other.y_ - y_ * other.x_);
 }
 
 #endif
