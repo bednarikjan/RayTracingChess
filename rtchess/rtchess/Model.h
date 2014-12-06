@@ -18,14 +18,14 @@ public:
 		cout << "Loading model..." << endl;
 
 		// DEBUG - generate a few spheres
-		//shapes.push_back(new Sphere(Vector3d(0.0, 0.0, -10003.0), 10000.0, Material(Vector3d(0.2, 0.2, 0.2), 0.9, 0.0, 0.0, 0.0)));  // ground
-		//shapes.push_back(new Sphere(Vector3d(5.0, 50.0, 3.0), 5.0, Material(Vector3d(0.8, 0.15, 0.15), 0.1, 0.0, 0.0, 10.0))); // red
-		//shapes.push_back(new Sphere(Vector3d(1.0, 40.0, 5.0), 3.0, Material(Vector3d(0.15, 0.8, 0.15), 0.8, 0.0, 1.5, 50.0))); // green
+		shapes.push_back(new Sphere(Vector3d(0.0, 0.0, -10003.0), 10000.0, Material(Vector3d(0.2, 0.2, 0.2), 0.9, 0.0, 0.0, 0.0)));  // ground
+		shapes.push_back(new Sphere(Vector3d(5.0, 50.0, 3.0), 5.0, Material(Vector3d(0.8, 0.15, 0.15), 0.1, 0.0, 0.0, 10.0))); // red
+		shapes.push_back(new Sphere(Vector3d(1.0, 40.0, 5.0), 3.0, Material(Vector3d(0.15, 0.8, 0.15), 0.8, 0.0, 1.5, 50.0))); // green
 
 		// DEBUG - generate a few triangles
-		shapes.push_back(new Triangle(Vector3d(-20.0, 100.0, -20.0), Vector3d(20.0, 100.0, -20.0), Vector3d(-5.0, 100.0, 20.0),
+		/*shapes.push_back(new Triangle(Vector3d(-20.0, 100.0, -20.0), Vector3d(20.0, 100.0, -20.0), Vector3d(-5.0, 100.0, 20.0),
 									  Vector3d(0.0, -1.0, 0.0).normalize(), Vector3d(0.0, -1.0, 0.0).normalize(), Vector3d(0.0, -1.0, 0.0).normalize(), 
-									  Material(Vector3d(0.15, 0.15, 0.85), 0.0, 0.0, 0.0, 10.0)));		
+									  Material(Vector3d(0.15, 0.15, 0.85), 0.0, 0.0, 0.0, 10.0)));		*/
 	}	
 
 	Model(string& fileName) { 
@@ -96,10 +96,10 @@ inline void Model::load(string fileName) {
 	// debug
 	/*Vector3d shift(-2.0, 5.0, -1.5);*/
 	Vector3d shift(0.0, 20.0, 20.0);
-	for(unsigned i = 0; i < shapes.size(); ++i) {
+	/*for(unsigned i = 0; i < shapes.size(); ++i) {
 		static_cast<Triangle*>(shapes.at(i))->v0 = static_cast<Triangle*>(shapes.at(i))->v0 + shift;
 		static_cast<Triangle*>(shapes.at(i))->v1 = static_cast<Triangle*>(shapes.at(i))->v1 + shift;
-		static_cast<Triangle*>(shapes.at(i))->v2 = static_cast<Triangle*>(shapes.at(i))->v2 + shift;
+		static_cast<Triangle*>(shapes.at(i))->v2 = static_cast<Triangle*>(shapes.at(i))->v2 + shift;*/
 
 		/*cout << "triangle " << i << ":" << endl;
 		cout << static_cast<Triangle*>(shapes.at(i))->v0 << 
@@ -108,7 +108,7 @@ inline void Model::load(string fileName) {
 		cout << static_cast<Triangle*>(shapes.at(i))->n0 << 
 			static_cast<Triangle*>(shapes.at(i))->n1 <<
 			static_cast<Triangle*>(shapes.at(i))->n2 << endl;*/
-	}	
+	//}	
 }
 
 #endif

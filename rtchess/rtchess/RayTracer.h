@@ -43,32 +43,47 @@ inline void RayTracer::render(Vector3d* image)
 	double pxw = camera_->getPxStep();
 
 	// TopLeft screen pixel position	
-	Point pxTL = Point(-((w / 2.0 - 0.5) * pxw), camera_->screenCenter.y_, (h / 2.0 - 0.5) * pxw);
-	
+	//Point pxTL = Point(-((w / 2.0 - 0.5) * pxw), camera_->screenCenter.y_, (h / 2.0 - 0.5) * pxw);
+	//
+	//// trace ray through each pixel
+	//for(int i = 0; i < h; i++) {		
+	//	for(int j = 0; j < w; j++) {
+	//		Ray ray(camera_->position_, (pxTL + Point(j * pxw, 0.0, -i * pxw)) - camera_->position_);
+	//		image[i * w + j] = trace(ray, maxDepth_, false);
+	//	}
+	//}
+
+	//// TopLeft screen pixel position	
+	Point pxTL = camera_->getTopLeftPX();
+	Point px = pxTL;
+	Vector3d wStep = camera_->getWidthStep();
+	Vector3d hStep = camera_->getHeightStep();
+
 	// trace ray through each pixel
 	for(int i = 0; i < h; i++) {		
+		px = pxTL + i * hStep;
 		for(int j = 0; j < w; j++) {
-			Ray ray(camera_->position_, (pxTL + Point(j * pxw, 0.0, -i * pxw)) - camera_->position_);
+			Ray ray(camera_->position(), px - camera_->position());
 			image[i * w + j] = trace(ray, maxDepth_, false);
-		}
+			px = px + wStep;
+		}		
 	}
 }
 
 inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 {		
-	
 	Shape::Intersection is, isC;	// intersection info
 	isC.t = INFINITY;						
 	Vector3d color;					// resulting pixel color
 
 	// find closest intersection	
-	for(int i = 0; i < (int)model_->shapes.size(); i++) {
+	for(int i = 0; i < (int)model_->shapes.size(); i++) {		
 		if(model_->shapes.at(i)->intersects(ray, is) && (is.t < isC.t))
 			isC = is;					
-	}
+	}	
 
 	// some intersection found
-	if(isC.t < INFINITY) {			
+	if(isC.t < INFINITY) {					
 		Vector3d cop(0.0, 0.0, 0.0);	// color of object at the given pixel.
 		Vector3d cr(0.0, 0.0, 0.0);		// color of reflected ray
 		Vector3d ct(0.0, 0.0, 0.0);		// color of refracted ray
@@ -107,7 +122,7 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 
 			// specular
 			R = -lv + isC.normal * (2 * lv.dot(isC.normal));	// reflected light ray
-			V = (camera_->position_ - isectOut).normalize();	// viewer-intersection ray
+			V = (camera_->position() - isectOut).normalize();	// viewer-intersection ray
 			Is = pow(max(0.0, R.dot(V)), isC.obj->mat_.shininess) * ks;			
 		}
 

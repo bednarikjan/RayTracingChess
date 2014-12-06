@@ -29,6 +29,9 @@ int main(int argc, char** argv)
 	// Create scene and fill it with model
 	Scene scene(modelFile);	
 
+	// try to adjust camera position
+	scene.setCameraLocation(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0).normalize());
+
 	// Render
 	scene.render();
 

@@ -12,34 +12,53 @@
 
 using namespace std;
 
+const Camera DEFALUT_CAMERA(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 160, 120, 45);
+const Light DEFAULT_LIGHT(Vector3d(4.0, 1.0, 6.0), 0.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));		
+
 class Scene
 {
 public:
 	//! Constructor
 	Scene(string& fileName) 
-	{ 
-		Camera camera(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 1920, 1080, 50);
-		Light light(Vector3d(5.0, -10.0, 5.0), 0.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));		
-		init(fileName, camera, light);
+	{ 		
+		//model_ = new Model();
+		model_ = new Model(fileName);
+		init(DEFALUT_CAMERA, DEFAULT_LIGHT);
 	}
 
 	Scene(Camera& camera, Light& light, string& fileName)
 	{ 
-		init(fileName, camera, light);		
+		//model_ = new Model();
+		model_ = new Model(fileName);
+		init(camera, light);		
 	}		
+
+	Scene(Model *model) 
+	{ 
+		assert(model != NULL);
+		model_ = model;
+		init(DEFALUT_CAMERA, DEFAULT_LIGHT);
+	}
+
+	Scene(Camera& camera, Light& light, Model *model) 
+	{ 
+		assert(model != NULL);
+		model_ = model;
+		init(camera, light);	
+	}
 	
 	//! Destructor
 	~Scene(void) 
 	{
-		delete model;
+		delete model_;
 		delete rayTracer;
 		delete[] image;
 	}	
 
 	void setCameraLocation(Vector3d position, Vector3d direction) 
 	{
-		rayTracer->camera_->position_ = position;
-		rayTracer->camera_->direction_ = direction;			
+		rayTracer->camera_->setPosition(position);
+		rayTracer->camera_->setDirection(direction);
 	}
 
 	void setCameraResolution(unsigned screenWidth, unsigned screenHeight)
@@ -70,15 +89,13 @@ public:
 
 private:	
 	RayTracer* rayTracer;	//!< ray tracer
-	Model* model;			//!< loaded model (triangle model or spheres)
+	Model* model_;			//!< loaded model (triangle model or spheres)
 	Vector3d *image;		//!< output image (matrix of RGB vectors)
 
 	//! Initalizes teh object
-	void init(string& fileName, Camera& camera, Light& light)
-	{		
-		//model = new Model();
-		model = new Model(fileName);
-		rayTracer = new RayTracer(camera, light, model);
+	void init(Camera camera, Light light)
+	{				
+		rayTracer = new RayTracer(camera, light, model_);
 		image = new Vector3d[camera.getScreenHeight() * camera.getScreenWidth()];		
 	}	
 };
