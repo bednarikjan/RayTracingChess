@@ -76,11 +76,13 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 	isC.t = INFINITY;						
 	Vector3d color;					// resulting pixel color
 
-	// find closest intersection	
-	for(int i = 0; i < (int)model_->shapes.size(); i++) {		
-		if(model_->shapes.at(i)->intersects(ray, is) && (is.t < isC.t))
-			isC = is;					
-	}	
+	// find closest intersection
+	for(int i = 0; i < (int)model_->objects_.size(); i ++) {
+		for(int j = 0; j < (int)model_->objects_.at(i).shapes.size(); j++) {		
+			if(model_->objects_.at(i).shapes.at(j)->intersects(ray, is) && (is.t < isC.t))
+				isC = is;					
+		}		
+	}
 
 	// some intersection found
 	if(isC.t < INFINITY) {					
@@ -98,10 +100,12 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 		if(inside || lv.dot(isC.normal) < 0.0) {		// inside object or face turned away from light			
 			illuminated = false;			
 		} else {
-			for(int i = 0; i < (int)model_->shapes.size(); i++) {
-				if(model_->shapes.at(i)->intersects(Ray(isectOut, lv), is)) {
-					illuminated = false;
-					break;
+			for(int i = 0; i < (int)model_->objects_.size(); i ++) {
+				for(int j = 0; j < (int)model_->objects_.at(i).shapes.size(); j++) {			
+					if(model_->objects_.at(i).shapes.at(j)->intersects(Ray(isectOut, lv), is)) {
+						illuminated = false;
+						break;
+					}
 				}
 			}
 		}
@@ -123,19 +127,19 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 			// specular
 			R = -lv + isC.normal * (2 * lv.dot(isC.normal));	// reflected light ray
 			V = (camera_->position() - isectOut).normalize();	// viewer-intersection ray
-			Is = pow(max(0.0, R.dot(V)), isC.obj->mat_.shininess) * ks;			
+			Is = pow(max(0.0, R.dot(V)), isC.obj->mat_->shininess) * ks;			
 		}
 
-		cop = light_->mat_.color * isC.obj->mat_.color * (Ia + Id + Is);
+		cop = light_->mat_->color * isC.obj->mat_->color * (Ia + Id + Is);
 
 		// reflective object
-		if(!inside && isC.obj->mat_.reflection > 0.0 && depth > 0) {
+		if(!inside && isC.obj->mat_->reflection > 0.0 && depth > 0) {
 			cr = trace(Ray(isectOut, ray.getDir() + isC.normal * (2 * (-(ray.getDir())).dot(isC.normal))) , depth - 1, false);
 		}
 
 		// transparent object
-		if(isC.obj->mat_.transparency > 0.0 && depth > 0) {
-			double ref = inside ? (1.0 / isC.obj->mat_.refractIdx) : (isC.obj->mat_.refractIdx); // n1 / n2 - ratio of refr. idxs
+		if(isC.obj->mat_->transparency > 0.0 && depth > 0) {
+			double ref = inside ? (1.0 / isC.obj->mat_->refractIdx) : (isC.obj->mat_->refractIdx); // n1 / n2 - ratio of refr. idxs
 			Vector3d normal = inside ? isC.normal : -isC.normal;
 			double cosI = normal.dot(ray.getDir()); // cosine of incident ray
 			Vector3d refrDir(ref * ray.getDir() + (ref * cosI - sqrt(1.0 - ref * ref * (1.0 - cosI * cosI))) * normal);
@@ -145,8 +149,8 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 		if(inside) {
 			color = ct;
 		} else {
-			color = isC.obj->mat_.transparency * ct + 
-				(1.0 - isC.obj->mat_.transparency) * (isC.obj->mat_.reflection * cr + (1.0 - isC.obj->mat_.reflection) * cop);
+			color = isC.obj->mat_->transparency * ct + 
+				(1.0 - isC.obj->mat_->transparency) * (isC.obj->mat_->reflection * cr + (1.0 - isC.obj->mat_->reflection) * cop);
 		}
 	} 
 	// no intersection

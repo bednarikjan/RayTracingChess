@@ -12,8 +12,9 @@
 
 using namespace std;
 
+Material DEFAULT_LIGHT_MATERIAL(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0);
 const Camera DEFALUT_CAMERA(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 160, 120, 45);
-const Light DEFAULT_LIGHT(Vector3d(4.0, 1.0, 6.0), 0.0, Material(Vector3d(1.0, 1.0, 1.0), 0.0, 0.0, 0.0, 0.0));		
+const Light DEFAULT_LIGHT(Vector3d(4.0, 1.0, 6.0), 0.0, &DEFAULT_LIGHT_MATERIAL);		
 
 class Scene
 {
@@ -22,14 +23,14 @@ public:
 	Scene(string& fileName) 
 	{ 		
 		//model_ = new Model();
-		model_ = new Model(fileName);
+		model_ = new ModelGeneral(fileName);
 		init(DEFALUT_CAMERA, DEFAULT_LIGHT);
 	}
 
 	Scene(Camera& camera, Light& light, string& fileName)
 	{ 
 		//model_ = new Model();
-		model_ = new Model(fileName);
+		model_ = new ModelGeneral(fileName);
 		init(camera, light);		
 	}		
 

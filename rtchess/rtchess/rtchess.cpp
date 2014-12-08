@@ -3,6 +3,7 @@
 #include "RayTracer.h"
 #include "Camera.h"
 #include "Shape.h"
+#include "Chess.h"
 
 using namespace std;
 
@@ -23,11 +24,15 @@ int main(int argc, char** argv)
 	string modelFile = string(argv[1]);
 	string outputFile = string(argv[2]);			
 
+	// prepare chessboard
+	Chess chess(modelFile);
+
 	// Set camera and light				
 	// -- or use defaults set by Scene constructor --
 
 	// Create scene and fill it with model
-	Scene scene(modelFile);	
+	/*Scene scene(modelFile);	*/
+	Scene scene(chess.getModel());	
 
 	// try to adjust camera position
 	scene.setCameraLocation(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0).normalize());

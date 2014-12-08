@@ -83,19 +83,36 @@ void testVector()
 	Test::assertTrue((v1 * v2) == Vector3d(v1.x_ * v2.x_, v1.y_ * v2.y_, v1.z_ * v2.z_), 
 		string("Wrong implementation of operator* for Vector3d"));	
 
-	// -- test 3 --	
+	// -- test 4 --	
 	Test::assertTrue((v1 * -3.5) == Vector3d(v1.x_ * -3.5, v1.y_ * -3.5, v1.z_ * -3.5), 
 		string("Wrong implementation of operator* for double"));	
 
 	Test::assertTrue((-3.5 * v1) == Vector3d(v1.x_ * -3.5, v1.y_ * -3.5, v1.z_ * -3.5), 
 		string("Wrong implementation of operator* for double"));
 
-	// -- test 3 --	cross product
+	// -- test 5 --	cross product
 	Test::assertTrue(v1.cross(v2) == Vector3d(-63.05, -2.32, -11.8), 
 		string("Wrong implementation of cross product"));
 	
 	Test::assertTrue(Vector3d(1.3, 13.5, -7.1).cross(Vector3d(2.6, 27.0, -14.2)) == Vector3d(0.0, 0.0, 0.0), 
 		string("Wrong implementation of cross product"));
+
+	// -- test 6 -- min
+	Test::assertTrue(Vector3d(-2.0, 5.1, -3.1).min() == -3.1, 
+		string("Wrong implementation of min()")); 
+
+	// -- test 7 -- max
+	Test::assertTrue(Vector3d(-2.0, 5.1, -3.1).max() == 5.1, 
+		string("Wrong implementation of max()"));
+
+	// -- test 8 -- operator+=
+	Vector3d v4(1.5, -9.1, 3.8);
+	Vector3d v5(3.78, 89.2, -15.15);	
+	Vector3d v6 = v5;
+	v6 += v4;
+
+	Test::assertTrue(v6 == v4 + v5, 
+		string("Wrong implementation of operator+="));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -117,7 +134,7 @@ void testSphere()
 	Shape::Intersection isectInfo;
 
 	// -- test 1 --	
-	Sphere s1(Point(0.0, 0.0, 0.0), 5.0, mat);
+	Sphere s1(Point(0.0, 0.0, 0.0), 5.0, &mat);
 	Ray r1(Point(0.0, 0.0, 10.0), Vector3d(0.0, 0.0, -1.0));		
 
 	Test::assertTrue(s1.intersects(r1, isectInfo), string("should intersect"));	
@@ -125,7 +142,7 @@ void testSphere()
 	Test::assertTrue(isectInfo.normal == Vector3d(0.0, 0.0, 1.0).normalize(), string("wrong normal vector"));	
 
 	// -- test 2 --	
-	Sphere s2(Point(0.0, 0.0, 0.0), 5.0, mat);
+	Sphere s2(Point(0.0, 0.0, 0.0), 5.0, &mat);
 	Ray r2(Point(1.0, 1.0, 1.0), Vector3d(1.0, 1.0, 1.0));		
 
 	Test::assertTrue(s2.intersects(r2, isectInfo), string("should intersect"));	

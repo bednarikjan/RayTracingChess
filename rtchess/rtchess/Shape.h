@@ -24,7 +24,7 @@ struct Material
 class Shape
 {
 public:
-	Shape(Material& mat = Material(Vector3d(0.5, 0.5, 0.5), 0.0, 0.0, 0.0, 4.0)) : mat_(mat) { }
+	Shape(Material* mat) : mat_(mat) { }
 	~Shape() { }
 
 	struct Intersection {
@@ -35,15 +35,15 @@ public:
 	};
 
 	//! Calculates coordinates of intersection with given ray.
-	virtual bool intersects(const Ray& ray, Intersection& intersection) = 0;	
+	virtual bool intersects(const Ray& ray, Intersection& intersection) = 0;
 
-	Material mat_;
+	Material* mat_;
 };
 
 class Sphere: public Shape
 {
 public:	
-	Sphere(Point& center, double radius, Material& material) : 
+	Sphere(Point& center, double radius, Material* material) : 
 		Shape(material), center_(center), radius_(radius) { }
 	~Sphere() { }
 
@@ -94,7 +94,7 @@ class Triangle: public Shape
 public:
 	Triangle(Vector3d v0, Vector3d v1, Vector3d v2, 
 			 Vector3d n0, Vector3d n1, Vector3d n2,
-			 Material& material) : Shape(material), 
+			 Material* material) : Shape(material), 
 			 v0(v0), v1(v1), v2(v2), n0(n0), n1(n1), n2(n2) { }
 	~Triangle() { }
 

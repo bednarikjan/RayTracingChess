@@ -28,9 +28,18 @@ public:
 	Vector3d& normalize();
 	double dot(Vector3d& other);
 	Vector3d cross(Vector3d& other);
+	double min();
+	double max();
 
 	Vector3d operator+(Vector3d& other) {
 		return Vector3d(x_ + other.x_, y_ + other.y_, z_ + other.z_);
+	}
+
+	Vector3d operator+=(Vector3d& other) {
+		x_ += other.x_;
+		y_ += other.y_;
+		z_ += other.z_;
+		return *this;
 	}
 	
 	Vector3d operator-() {
@@ -98,6 +107,16 @@ inline Vector3d Vector3d::cross(Vector3d& other) {
 	return Vector3d(y_ * other.z_ - z_ * other.y_, 
 					z_ * other.x_ - x_ * other.z_, 
 					x_ * other.y_ - y_ * other.x_);
+}
+
+inline double Vector3d::min()
+{
+	return (x_ < y_) ? ((x_ < z_) ? x_ : z_) : ((y_ < z_) ? y_ : z_); 
+}
+
+inline double Vector3d::max()
+{
+	return (x_ > y_) ? ((x_ > z_) ? x_ : z_) : ((y_ > z_) ? y_ : z_); 
 }
 
 #endif

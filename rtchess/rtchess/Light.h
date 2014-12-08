@@ -7,7 +7,7 @@
 class Light: public Sphere
 {
 public:	
-	Light(Vector3d& position, double radius, Material& material): 
+	Light(Vector3d& position, double radius, Material* material): 
 		Sphere(position, radius, material) { }
 	~Light() {  }
 };
