@@ -11,8 +11,10 @@ using namespace std;
 
 struct Object
 {	
+	Object() : visible(true) { }
 	vector<Shape *> shapes;			
 	vector<Shape *> boundingBox;	
+	bool visible;
 };
 
 class Model 

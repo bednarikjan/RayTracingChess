@@ -8,7 +8,7 @@
 class RayTracer 
 {
 public:
-	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 0): model_(model), maxDepth_(maxDepth)
+	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 5): model_(model), maxDepth_(maxDepth)
 	{ 
 		camera_ = new Camera(camera);
 		light_ = new Light(light);
@@ -42,17 +42,6 @@ inline void RayTracer::render(Vector3d* image)
 	int h = camera_->getScreenHeight();
 	double pxw = camera_->getPxStep();
 
-	// TopLeft screen pixel position	
-	//Point pxTL = Point(-((w / 2.0 - 0.5) * pxw), camera_->screenCenter.y_, (h / 2.0 - 0.5) * pxw);
-	//
-	//// trace ray through each pixel
-	//for(int i = 0; i < h; i++) {		
-	//	for(int j = 0; j < w; j++) {
-	//		Ray ray(camera_->position_, (pxTL + Point(j * pxw, 0.0, -i * pxw)) - camera_->position_);
-	//		image[i * w + j] = trace(ray, maxDepth_, false);
-	//	}
-	//}
-
 	//// TopLeft screen pixel position	
 	Point pxTL = camera_->getTopLeftPX();
 	Point px = pxTL;
@@ -79,6 +68,10 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 
 	// find closest intersection
 	for(int i = 0; i < (int)model_->objects_.size(); i ++) {
+		// check preset visibility of object
+		if(!model_->objects_.at(i).visible) 
+			continue;
+
 		intersectsBoundingBox = false;
 
 		// check intersection with bounding box		
@@ -115,13 +108,17 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 		if(inside || lv.dot(isC.normal) < 0.0) {		// inside object or face turned away from light			
 			illuminated = false;			
 		} else {
-			for(int i = 0; i < (int)model_->objects_.size(); i ++) {
+			for(int i = 0; i < (int)model_->objects_.size() && illuminated; i++) {
+				// check preset visibility of object
+				if(!model_->objects_.at(i).visible) 
+					continue;
+
 				intersectsBoundingBox = false;
 				
 				// check intersection with the bounding box
 				if(model_->objects_.at(i).boundingBox.size() > 0) {
 					for(int j = 0; j < (int)model_->objects_.at(i).boundingBox.size(); j++)
-						if(model_->objects_.at(i).boundingBox.at(j)->intersects(ray, is))
+						if(model_->objects_.at(i).boundingBox.at(j)->intersects(Ray(isectOut, lv), is))
 							intersectsBoundingBox = true;			
 				} else {
 					intersectsBoundingBox = true;

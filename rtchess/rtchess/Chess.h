@@ -63,17 +63,25 @@ public:
 	ModelChess(string fileName) : fieldWidth(0.0) { 
 		objects_ = vector<Object>(ModelChess::CHESS_MODEL_OBJECTS_COUNT, Object());
 
-		matChessboardW = new Material(Vector3d(0.9, 0.9, 0.9), 0.85, 0.0, 0.0, 4.0);
-		matChessboardB = new Material(Vector3d(0.1, 0.1, 0.1), 0.85, 0.0, 0.0, 4.0);
-		matPieceW = new Material(Vector3d(0.88, 0.88, 0.66), 0.3, 0.0, 0.0, 16.0);
-		matPieceB = new Material(Vector3d(0.32, 0.2, 0.01), 0.3, 0.0, 0.0, 16.0);		
+		matChessboardW = new Material(Vector3d(0.6, 0.6, 0.6), 0.7, 0.0, 0.0, 4.0);
+		matChessboardB = new Material(Vector3d(0.1, 0.1, 0.1), 0.7, 0.0, 0.0, 4.0);
+		matPieceW = new Material(Vector3d(0.88, 0.88, 0.66), 0.2, 0.0, 0.0, 16.0);
+		matPieceB = new Material(Vector3d(0.32, 0.2, 0.01), 0.2, 0.0, 0.0, 16.0);		
 
 		// load model
 		load(fileName);
 
 		// create bounding box for each object
-		for(int i = 0; i < (int)objects_.size(); i++)
+		for(int i = 0; i < (int)objects_.size(); i++) {
 			createBoundingBox(i);
+		}
+
+		// debug - make only 1 piece and chessboard visible
+		/*for(int i = 0; i < (int)objects_.size(); i++)
+			objects_.at(i).visible = false;
+		objects_.at(PAWN_2_W).visible = true;
+		objects_.at(CHESSBOARD_W).visible = true;
+		objects_.at(CHESSBOARD_B).visible = true;*/
 	}
 
 	~ModelChess() { 
