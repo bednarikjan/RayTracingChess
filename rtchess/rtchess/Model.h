@@ -5,15 +5,14 @@
 #include <cctype>
 #include "Shape.h"
 #include "Vector3d.h"
+#include "common.h"
 
 using namespace std;
 
 struct Object
 {	
-	vector<Shape *> shapes;	
-	
-	// TODO - add bounding box
-	// Sphere boundingBox;
+	vector<Shape *> shapes;			
+	vector<Shape *> boundingBox;	
 };
 
 class Model 
@@ -26,13 +25,72 @@ public:
 	~Model() { }
 
 	/*!
-		Loads model from .OBJ file. Expects parameters v, vn, f
+		Loads model from .OBJ file. Expects parameters v, vn, f.
 	*/
 	virtual void load(string fileName) = 0;	
-	  
+
+	//! Creates a bounding box for the given obeject - cuboid (12 triangles)
+	virtual void createBoundingBox(int objectIdx);
+
 	vector<Object> objects_;	
 	bool visible;
 };
+
+void Model::createBoundingBox(int objectIdx)
+{
+	Vector3d cmin(INFINITY, INFINITY, INFINITY);
+	Vector3d cmax(-INFINITY, -INFINITY, -INFINITY);
+
+	for(int i = 0; i < (int)objects_.at(objectIdx).shapes.size(); i++) {
+		Vector3d minTmp = objects_.at(objectIdx).shapes.at(i)->minCoords();
+		Vector3d maxTmp = objects_.at(objectIdx).shapes.at(i)->maxCoords();
+
+		if(minTmp.x_ < cmin.x_) cmin.x_ = minTmp.x_;
+		if(minTmp.y_ < cmin.y_) cmin.y_ = minTmp.y_;
+		if(minTmp.z_ < cmin.z_) cmin.z_ = minTmp.z_;
+		if(maxTmp.x_ > cmax.x_) cmax.x_ = maxTmp.x_;
+		if(maxTmp.y_ > cmax.y_) cmax.y_ = maxTmp.y_;
+		if(maxTmp.z_ > cmax.z_) cmax.z_ = maxTmp.z_;
+	}
+
+	// cuboid vertices
+	Point v[8] = { 
+		Point(cmin.x_, cmin.y_, cmin.z_),
+		Point(cmax.x_, cmin.y_, cmin.z_),
+		Point(cmin.x_, cmax.y_, cmin.z_),
+		Point(cmax.x_, cmax.y_, cmin.z_),
+		Point(cmin.x_, cmin.y_, cmax.z_),
+		Point(cmax.x_, cmin.y_, cmax.z_),
+		Point(cmin.x_, cmax.y_, cmax.z_),
+		Point(cmax.x_, cmax.y_, cmax.z_),	
+	};
+
+	// cuboid normals
+	/*Vector3d n[6] = {
+		Vector3d((v[2] - v[0]).cross(v[1] - v[0]).normalize()),
+		Vector3d((v[5] - v[1]).cross(v[0] - v[1]).normalize()),
+		Vector3d((v[7] - v[3]).cross(v[1] - v[3]).normalize()),
+		Vector3d((v[2] - v[3]).cross(v[7] - v[3]).normalize()),
+		Vector3d((v[0] - v[2]).cross(v[6] - v[2]).normalize()),
+		Vector3d((v[7] - v[5]).cross(v[4] - v[5]).normalize())
+	};*/
+
+	// sample normal - not used in bounding box's triangles
+	Vector3d n(1.0, 0.0, 0.0);
+
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[1], v[3], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[3], v[2], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[1], v[5], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[5], v[4], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[1], v[3], v[7], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[1], v[7], v[5], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[3], v[2], v[7], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[2], v[6], v[7], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[2], v[0], v[6], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[4], v[6], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[4], v[5], v[7], n, n, n, NULL));
+	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[4], v[7], v[6], n, n, n, NULL));
+}
 
 class ModelGeneral : public Model
 {
@@ -66,7 +124,7 @@ public:
 		}
 	}
 
-	virtual void load(string fileName);	
+	virtual void load(string fileName);		
 
 	// TODO -> move somwhere else
 	Material* m;

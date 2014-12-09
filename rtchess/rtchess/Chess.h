@@ -8,10 +8,9 @@
 // project includes
 #include "Model.h"
 #include "Material.h"
+#include "common.h"
 
 using namespace std;
-
-const double INFINITY = std::numeric_limits<double>::max();
 
 //! Class implements specific model with chessboard and 32 chess pieces
 /*!
@@ -69,7 +68,12 @@ public:
 		matPieceW = new Material(Vector3d(0.88, 0.88, 0.66), 0.3, 0.0, 0.0, 16.0);
 		matPieceB = new Material(Vector3d(0.32, 0.2, 0.01), 0.3, 0.0, 0.0, 16.0);		
 
+		// load model
 		load(fileName);
+
+		// create bounding box for each object
+		for(int i = 0; i < (int)objects_.size(); i++)
+			createBoundingBox(i);
 	}
 
 	~ModelChess() { 
@@ -80,7 +84,7 @@ public:
 	}
 
 	//! Loads chess model from the OBJ file with specific format (see class description).
-	virtual void load(string fileName);
+	virtual void load(string fileName);		
 
 	//! Moves the given piece from the given position to the new position in Z plane
 	void move(ModelChess::chessModelObjects piece, chessBoardCoords& from, chessBoardCoords& to);
@@ -175,6 +179,7 @@ inline void ModelChess::load(string fileName)
 		} else if(line[0] == 'f' && isspace(line[1])) {
 			unsigned iv1, iv2, iv3;
 			unsigned in1, in2, in3;
+
 			sscanf(line.c_str(), "%*s %u//%u %u//%u %u//%u", &iv1, &in1, &iv2, &in2, &iv3, &in3);
 			objects_.at(modelObject).shapes.push_back(new Triangle(vertices.at(iv1 - 1), vertices.at(iv2 - 1), vertices.at(iv3 - 1),
 										  normals.at(in1 - 1),  normals.at(in2 - 1),  normals.at(in3 - 1), m));

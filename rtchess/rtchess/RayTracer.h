@@ -72,16 +72,31 @@ inline void RayTracer::render(Vector3d* image)
 
 inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 {		
+	bool intersectsBoundingBox;
 	Shape::Intersection is, isC;	// intersection info
 	isC.t = INFINITY;						
 	Vector3d color;					// resulting pixel color
 
 	// find closest intersection
 	for(int i = 0; i < (int)model_->objects_.size(); i ++) {
-		for(int j = 0; j < (int)model_->objects_.at(i).shapes.size(); j++) {		
-			if(model_->objects_.at(i).shapes.at(j)->intersects(ray, is) && (is.t < isC.t))
-				isC = is;					
-		}		
+		intersectsBoundingBox = false;
+
+		// check intersection with bounding box		
+		if(model_->objects_.at(i).boundingBox.size() > 0) {
+			for(int j = 0; j < (int)model_->objects_.at(i).boundingBox.size(); j++)
+				if(model_->objects_.at(i).boundingBox.at(j)->intersects(ray, is))
+					intersectsBoundingBox = true;			
+		} else {
+			intersectsBoundingBox = true;
+		}
+		
+		// check intersction with the object
+		if(intersectsBoundingBox) {
+			for(int j = 0; j < (int)model_->objects_.at(i).shapes.size(); j++) {		
+				if(model_->objects_.at(i).shapes.at(j)->intersects(ray, is) && (is.t < isC.t))
+					isC = is;					
+			}		
+		}
 	}
 
 	// some intersection found
@@ -101,10 +116,24 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 			illuminated = false;			
 		} else {
 			for(int i = 0; i < (int)model_->objects_.size(); i ++) {
-				for(int j = 0; j < (int)model_->objects_.at(i).shapes.size(); j++) {			
-					if(model_->objects_.at(i).shapes.at(j)->intersects(Ray(isectOut, lv), is)) {
-						illuminated = false;
-						break;
+				intersectsBoundingBox = false;
+				
+				// check intersection with the bounding box
+				if(model_->objects_.at(i).boundingBox.size() > 0) {
+					for(int j = 0; j < (int)model_->objects_.at(i).boundingBox.size(); j++)
+						if(model_->objects_.at(i).boundingBox.at(j)->intersects(ray, is))
+							intersectsBoundingBox = true;			
+				} else {
+					intersectsBoundingBox = true;
+				}
+				
+				// check intersction with the object
+				if(intersectsBoundingBox) {
+					for(int j = 0; j < (int)model_->objects_.at(i).shapes.size(); j++) {			
+						if(model_->objects_.at(i).shapes.at(j)->intersects(Ray(isectOut, lv), is)) {
+							illuminated = false;
+							break;
+						}
 					}
 				}
 			}

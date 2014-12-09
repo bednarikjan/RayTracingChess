@@ -36,6 +36,8 @@ public:
 
 	//! Calculates coordinates of intersection with given ray.
 	virtual bool intersects(const Ray& ray, Intersection& intersection) = 0;
+	virtual Vector3d minCoords() = 0;
+	virtual Vector3d maxCoords() = 0;
 
 	Material* mat_;
 };
@@ -48,6 +50,8 @@ public:
 	~Sphere() { }
 
 	virtual bool intersects(const Ray& ray, Intersection& intersection);	
+	virtual Vector3d minCoords();
+	virtual Vector3d maxCoords();
 
 	Point center_;
 	double radius_;
@@ -89,6 +93,18 @@ inline bool Sphere::intersects(const Ray& ray, Intersection& info)
 	return false;	
 }
 
+Vector3d Sphere::minCoords()
+{
+	std::cerr << "Sphere::minCoords() - not yet implemented." << std::endl;
+	exit(1);
+}
+
+Vector3d Sphere::maxCoords()
+{
+	std::cerr << "Sphere::maxCoords() - not yet implemented." << std::endl;
+	exit(1);
+}
+
 class Triangle: public Shape
 {
 public:
@@ -99,6 +115,8 @@ public:
 	~Triangle() { }
 
 	virtual bool intersects(const Ray& ray, Intersection& info);	
+	virtual Vector3d minCoords();
+	virtual Vector3d maxCoords();
 
 	Vector3d v0, v1, v2;	
 	Vector3d n0, n1, n2;	
@@ -147,5 +165,20 @@ inline bool Triangle::intersects(const Ray& ray, Intersection& info) {
 	}
 	return false;
 }
+
+Vector3d Triangle::minCoords()
+{
+	return Vector3d((v0.x_ < v1.x_) ? ((v0.x_ < v2.x_) ? v0.x_ : v2.x_) : ((v1.x_ < v2.x_) ? v1.x_ : v2.x_),
+					(v0.y_ < v1.y_) ? ((v0.y_ < v2.y_) ? v0.y_ : v2.y_) : ((v1.y_ < v2.y_) ? v1.y_ : v2.y_),
+					(v0.z_ < v1.z_) ? ((v0.z_ < v2.z_) ? v0.z_ : v2.z_) : ((v1.z_ < v2.z_) ? v1.z_ : v2.z_));
+}
+
+Vector3d Triangle::maxCoords()
+{
+	return Vector3d((v0.x_ > v1.x_) ? ((v0.x_ > v2.x_) ? v0.x_ : v2.x_) : ((v1.x_ > v2.x_) ? v1.x_ : v2.x_),
+					(v0.y_ > v1.y_) ? ((v0.y_ > v2.y_) ? v0.y_ : v2.y_) : ((v1.y_ > v2.y_) ? v1.y_ : v2.y_),
+					(v0.z_ > v1.z_) ? ((v0.z_ > v2.z_) ? v0.z_ : v2.z_) : ((v1.z_ > v2.z_) ? v1.z_ : v2.z_));
+}
+
 
 #endif

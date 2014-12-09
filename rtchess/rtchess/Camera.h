@@ -108,8 +108,8 @@ inline void Camera::updatePxStep()
 {	
 	// debug
 	fieldOfView_ = 45.0;
-	horizontalPixels_ = 160;
-	verticalPixels_ = 120;
+	horizontalPixels_ = 320;
+	verticalPixels_ = 240;
 
 	position_  = Point(-6.0, -3.0, 6.0);
 	direction_ = Vector3d(4.0, 3.0, -2.0).normalize();
