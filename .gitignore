@@ -40,7 +40,6 @@ dlldata.c
 *_i.h
 *.ilk
 *.meta
-*.obj
 *.pch
 *.pdb
 *.pgc
@@ -188,3 +187,8 @@ Pokus/
 
 # Output rendered PPM images
 *.ppm
+*.ppm
+
+# Files associated to models
+.mtl
+.blend
