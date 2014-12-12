@@ -12,6 +12,7 @@ using namespace std;
 //! Material of the shape. 
 struct Material 
 {
+	Material() : color(Vector3d(0.0, 0.0, 0.0)), reflection(0.0), transparency(0.0), refractIdx(0.0), shininess(4.0) { }
 	Material(Vector3d& color, double reflection, double transparency, double refractiveIndex, double shininess) : 
 		color(color), reflection(reflection), transparency(transparency), refractIdx(refractiveIndex), shininess(shininess) { }
 	Vector3d color;			// RGB, <0.0 - 1.0>
@@ -36,6 +37,10 @@ public:
 
 	//! Calculates coordinates of intersection with given ray.
 	virtual bool intersects(const Ray& ray, Intersection& intersection) = 0;
+
+	//! Translates the shape
+	virtual void translate(Vector3d& t) = 0;
+
 	virtual Vector3d minCoords() = 0;
 	virtual Vector3d maxCoords() = 0;
 
@@ -50,6 +55,7 @@ public:
 	~Sphere() { }
 
 	virtual bool intersects(const Ray& ray, Intersection& intersection);	
+	virtual void translate(Vector3d& t);
 	virtual Vector3d minCoords();
 	virtual Vector3d maxCoords();
 
@@ -105,6 +111,12 @@ Vector3d Sphere::maxCoords()
 	exit(1);
 }
 
+void Sphere::translate(Vector3d& t)
+{
+	std::cerr << "Sphere::maxCoords() - not yet implemented." << std::endl;
+	exit(1);
+}
+
 class Triangle: public Shape
 {
 public:
@@ -115,6 +127,7 @@ public:
 	~Triangle() { }
 
 	virtual bool intersects(const Ray& ray, Intersection& info);	
+	virtual void translate(Vector3d& t);
 	virtual Vector3d minCoords();
 	virtual Vector3d maxCoords();
 
@@ -164,6 +177,13 @@ inline bool Triangle::intersects(const Ray& ray, Intersection& info) {
 		return true;
 	}
 	return false;
+}
+
+void Triangle::translate(Vector3d& t)
+{	
+	v0 += t; 
+	v1 += t;
+	v2 += t;
 }
 
 Vector3d Triangle::minCoords()

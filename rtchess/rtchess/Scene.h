@@ -20,16 +20,14 @@ class Scene
 {
 public:
 	//! Constructor
-	Scene(string& fileName) 
-	{ 		
-		//model_ = new Model();
-		model_ = new ModelGeneral(fileName);
+	Scene(string& modelFile) 
+	{ 				
+		model_ = new ModelGeneral(modelFile);
 		init(DEFALUT_CAMERA, DEFAULT_LIGHT);
 	}
 
 	Scene(Camera& camera, Light& light, string& fileName)
-	{ 
-		//model_ = new Model();
+	{ 		
 		model_ = new ModelGeneral(fileName);
 		init(camera, light);		
 	}		
@@ -82,6 +80,9 @@ public:
 		rayTracer->light_->radius_ = radius;
 	}
 
+	void setRecursionDepth(int depth) { rayTracer->setDepth(depth); }
+	void setBackgroundColor(Vector3d color) { rayTracer->setBackgroundColor(color); }
+
 	//! Main rendering function
 	void render();
 
@@ -98,7 +99,7 @@ private:
 	{				
 		rayTracer = new RayTracer(camera, light, model_);
 		image = new Vector3d[camera.getScreenHeight() * camera.getScreenWidth()];		
-	}	
+	}		
 };
 
 inline void Scene::render()

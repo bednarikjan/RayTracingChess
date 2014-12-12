@@ -1,0 +1,27 @@
+# camera
+camera-position	[-6.0, -3.0, 6.0]
+direction 		[0.5, 0.7, -0.3]
+width 			320
+height 			240
+fov 			45
+
+# light
+light-position	[0.5, 1.2, 2.7]
+
+# ray tracer
+depth			5
+bgrd-color		[0.0, 0.0, 0.0]
+
+# model
+white-piece-color			[0.88, 0.88, 0.66]
+white-piece-reflectivity	0.7
+white-piece-shininess		4.0
+black-piece-color			[0.32, 0.2, 0.01]
+black-piece-reflectivity	0.7
+black-piece-shininess		4.0
+white-field-color			[0.7, 0.7, 0.7]
+white-field-reflectivity	0.4
+white-field-shininess		16.0
+black-field-color			[0.88, 0.88, 0.66]
+black-field-reflectivity	0.4
+black-field-shininess		16.0

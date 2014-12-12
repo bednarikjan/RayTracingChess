@@ -4,11 +4,12 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Model.h"
+#include "common.h"
 
 class RayTracer 
 {
 public:
-	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 5): model_(model), maxDepth_(maxDepth)
+	RayTracer(Camera& camera, Light &light, Model* model, unsigned maxDepth = 0): model_(model), maxDepth_(maxDepth)
 	{ 
 		camera_ = new Camera(camera);
 		light_ = new Light(light);
@@ -28,13 +29,14 @@ public:
 	Model* model_;
 	unsigned maxDepth_;
 
+	void setDepth(unsigned depth) { maxDepth_ = depth; }
+	void setBackgroundColor(Vector3d color) { bgrdColor = color; }
+
 private:
-	Vector3d trace(Ray& ray, unsigned depth, bool inside);
-
-	static const double INFINITY;
+	Vector3d bgrdColor;
+	
+	Vector3d trace(Ray& ray, unsigned depth, bool inside);		
 };
-
-const double RayTracer::INFINITY = std::numeric_limits<double>::max();
 
 inline void RayTracer::render(Vector3d* image)
 {
@@ -46,12 +48,13 @@ inline void RayTracer::render(Vector3d* image)
 	Point pxTL = camera_->getTopLeftPX();
 	Point px = pxTL;
 	Vector3d wStep = camera_->getWidthStep();
-	Vector3d hStep = camera_->getHeightStep();
+	Vector3d hStep = camera_->getHeightStep();	
 
-	// trace ray through each pixel
+	// trace ray through each pixel	
 	for(int i = 0; i < h; i++) {		
 		px = pxTL + i * hStep;
-		for(int j = 0; j < w; j++) {
+		for(int j = 0; j < w; j++) {			
+			printf("\r%.3lf %%", (double)(i * w + j) / (double)(h * w) * 100.0);			
 			Ray ray(camera_->position(), px - camera_->position());
 			image[i * w + j] = trace(ray, maxDepth_, false);
 			px = px + wStep;
@@ -67,6 +70,7 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 	Vector3d color;					// resulting pixel color
 
 	// find closest intersection
+	#pragma omp parallel for
 	for(int i = 0; i < (int)model_->objects_.size(); i ++) {
 		// check preset visibility of object
 		if(!model_->objects_.at(i).visible) 
@@ -138,7 +142,7 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 
 		// evaluate Phong reflection and shading model
 		Vector3d R, V;
-		// TODO - should not be here! move somewhere else - class member perhaps, material?
+		
 		double Ia = 0.0, Id = 0.0, Is = 0.0;
 		double ka = 0.2, kd = 3.5, ks = 5.0;
 		//double ka = 0.0, kd = 3.5, ks = 5.0;		
@@ -181,8 +185,8 @@ inline Vector3d RayTracer::trace(Ray& ray, unsigned depth, bool inside)
 	} 
 	// no intersection
 	else {
-		if(depth == maxDepth_)
-			color = Vector3d(0.25, 0.25, 0.25);	// background color - GRAY
+		if(depth == maxDepth_)			
+			color = bgrdColor;
 		else
 			color = Vector3d(0.0, 0.0, 0.0);	// background color - BLACK
 	}

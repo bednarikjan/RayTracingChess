@@ -29,6 +29,8 @@ class Camera
 public:		
 	const Point screenCenter;			
 	
+	Camera() { }
+
 	//! Constructor
 	Camera(Vector3d position, Vector3d direction, 
 			unsigned horizontalPixels, unsigned verticalPixels, 
@@ -84,6 +86,18 @@ public:
 	Vector3d& getWidthStep() { return xStep; } 
 	Vector3d& getHeightStep() { return zStep; } 
 
+	void operator=(Camera other) {
+		position_ = other.position();
+		direction_ = other.direction();
+		horizontalPixels_ = other.getScreenWidth();
+		verticalPixels_ = other.getScreenHeight();
+		fieldOfView_ = other.getFieldOfView();
+		TLPx = other.getTopLeftPX();
+		xStep = other.getWidthStep();
+		zStep = other.getHeightStep();
+		pxStep = other.getPxStep();
+	}
+
 private:
 	Point position_;
 	Vector3d direction_;
@@ -106,15 +120,15 @@ private:
 
 inline void Camera::updatePxStep() 
 {	
-	// debug
-	fieldOfView_ = 45.0;
-	horizontalPixels_ = 1280;
-	verticalPixels_ = 960;
+	//// debug
+	//fieldOfView_ = 45.0;
+	//horizontalPixels_ = 640;
+	//verticalPixels_ = 480;
 
-	position_  = Point(-6.0, -3.0, 6.0);
-	//position_  = Point(-1.4, -0.75, 2.0);
-	direction_ = Vector3d(4.0, 3.0, -2.0).normalize();
-	//direction_ = Vector3d(0.0, -1.0, -0.2).normalize();
+	//position_  = Point(-6.0, -3.0, 6.0);
+	////position_  = Point(-1.4, -0.75, 2.0);
+	//direction_ = Vector3d(4.0, 3.0, -2.0).normalize();
+	////direction_ = Vector3d(0.0, -1.0, -0.2).normalize();
 	
 	// original inter-px distance when projection plane is perpendicular to y-axis
 	pxStep = fixedDirection.y_ * tan(DG_2_RAD(fieldOfView_ / 2.0)) / (horizontalPixels_ / 2.0);	

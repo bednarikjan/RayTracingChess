@@ -35,6 +35,17 @@ by the following requirements:
 	- The chessboard is aligned with the x, y plane and the left bottom corner
 	(where the black field should start) is positioned at [0, 0, 0].
 */
+
+/*Material DEFAULT_WHITE_FIELD_MATERIAL(Vector3d(0.8, 0.8, 0.8), 0.8, 0.0, 0.0, 4.0);
+Material DEFAULT_BLACK_FIELD_MATERIAL(Vector3d(0.1, 0.1, 0.1), 0.5, 0.0, 0.0, 4.0);
+Material DEFAULT_WHITE_PIECE_MATERIAL(Vector3d(0.343, 0.492, 0.97), 0.6, 0.0, 0.0, 16.0);
+Material DEFAULT_BLACK_PIECE_MATERIAL(Vector3d(0.273, 0.03, 0.03), 0.6, 0.0, 0.0, 16.0);	*/	
+
+Material DEFAULT_WHITE_FIELD_MATERIAL(Vector3d(0.8, 0.8, 0.8), 0.8, 0.0, 0.0, 4.0);
+Material DEFAULT_BLACK_FIELD_MATERIAL(Vector3d(0.1, 0.1, 0.1), 0.5, 0.0, 0.0, 4.0);
+Material DEFAULT_WHITE_PIECE_MATERIAL(Vector3d(0.88, 0.88, 0.88), 0.6, 0.0, 0.0, 16.0);
+Material DEFAULT_BLACK_PIECE_MATERIAL(Vector3d(0.2, 0.2, 0.2), 0.6, 0.0, 0.0, 16.0);	
+
 class ModelChess : public Model
 {
 public:
@@ -50,7 +61,8 @@ public:
 		CHESSBOARD_W, CHESSBOARD_B
 	};
 	
-	static const unsigned CHESS_MODEL_OBJECTS_COUNT;	
+	static const unsigned CHESS_MODEL_OBJECTS_COUNT;
+	static const unsigned CHESS_PIECES_COUNT;
 	static const char* modelObjectNames[];	
 
 	//! x,y chess board coordinates of the piece [<0;7>, <0;7>]
@@ -63,33 +75,21 @@ public:
 	ModelChess(string fileName) : fieldWidth(0.0) { 
 		objects_ = vector<Object>(ModelChess::CHESS_MODEL_OBJECTS_COUNT, Object());
 
-		matChessboardW = new Material(Vector3d(0.6, 0.6, 0.6), 0.7, 0.0, 0.0, 4.0);
-		matChessboardB = new Material(Vector3d(0.1, 0.1, 0.1), 0.7, 0.0, 0.0, 4.0);
-		matPieceW = new Material(Vector3d(0.88, 0.88, 0.66), 0.2, 0.0, 0.0, 16.0);
-		matPieceB = new Material(Vector3d(0.32, 0.2, 0.01), 0.2, 0.0, 0.0, 16.0);		
+		matChessboardW = &DEFAULT_WHITE_FIELD_MATERIAL;
+		matChessboardB = &DEFAULT_BLACK_FIELD_MATERIAL;
+		matPieceW = &DEFAULT_WHITE_PIECE_MATERIAL;
+		matPieceB = &DEFAULT_BLACK_PIECE_MATERIAL;
 
 		// load model
 		load(fileName);
 
 		// create bounding box for each object
 		for(int i = 0; i < (int)objects_.size(); i++) {
-			createBoundingBox(i);
+			objects_.at(i).createBoundingBox();
 		}
-
-		// debug - make only 1 piece and chessboard visible
-		/*for(int i = 0; i < (int)objects_.size(); i++)
-			objects_.at(i).visible = false;
-		objects_.at(PAWN_2_W).visible = true;
-		objects_.at(CHESSBOARD_W).visible = true;
-		objects_.at(CHESSBOARD_B).visible = true;*/
 	}
 
-	~ModelChess() { 
-		delete matChessboardW;
-		delete matChessboardB;
-		delete matPieceW;
-		delete matPieceB;
-	}
+	~ModelChess() { }
 
 	//! Loads chess model from the OBJ file with specific format (see class description).
 	virtual void load(string fileName);		
@@ -97,10 +97,21 @@ public:
 	//! Moves the given piece from the given position to the new position in Z plane
 	void move(ModelChess::chessModelObjects piece, chessBoardCoords& from, chessBoardCoords& to);
 
+	//! object visibility getter
+	bool getVisibility(chessModelObjects piece) { return objects_.at(piece).visible; }
+
+	//! object visibility setter
+	void setVisibility(chessModelObjects piece, bool visible) { objects_.at(piece).visible = visible; }
+
 	Material* matChessboardW; // chessboards' white fields material
 	Material* matChessboardB; // chessboards' black fields material
 	Material* matPieceW;	  // white pieces material
 	Material* matPieceB;	  // black pieces material
+
+	void setObjectMaterial(chessModelObjects obj, Material* m) {  
+		for(int i = 0; i < (int)objects_.at(obj).shapes.size(); i++)
+			objects_.at(obj).shapes.at(i)->mat_ = m;		
+	}
 
 private:
 	double fieldWidth;
@@ -110,6 +121,7 @@ private:
 };
 
 const unsigned ModelChess::CHESS_MODEL_OBJECTS_COUNT = 34;
+const unsigned ModelChess::CHESS_PIECES_COUNT = 32;
 const char* ModelChess::modelObjectNames[] = {	
 	"pawn_1_w",	"pawn_2_w",		"pawn_3_w",		"pawn_4_w", "pawn_5_w", "pawn_6_w",		"pawn_7_w",		"pawn_8_w",
 	"rook_1_w", "knight_1_w",	"bishop_1_w",	"queen_w",	"king_w",	"bishop_2_w",	"knight_2_w",	"rook_2_w",
@@ -123,12 +135,7 @@ const char* ModelChess::modelObjectNames[] = {
 inline void ModelChess::move(ModelChess::chessModelObjects piece, chessBoardCoords& from, chessBoardCoords& to)
 {
 	Vector3d t((to.x - from.x) * fieldWidth, (to.y - from.y) * fieldWidth, 0.0);	
-
-	for(int i = 0; i < (int)objects_.at(piece).shapes.size(); i++) {
-		static_cast<Triangle *>(objects_.at(piece).shapes.at(i))->v0 += t; 
-		static_cast<Triangle *>(objects_.at(piece).shapes.at(i))->v1 += t;
-		static_cast<Triangle *>(objects_.at(piece).shapes.at(i))->v2 += t;
-	}
+	objects_.at(piece).translate(t);
 }
 
 inline void ModelChess::load(string fileName)
@@ -150,19 +157,15 @@ inline void ModelChess::load(string fileName)
 	string line;
 	while(getline(file, line)) {				
 		// object 'o name_[n_]_{b|w}'
-		if(line[0] == 'o' && isspace(line[1])) {	
-			unsigned idx = string::npos;
+		if(line[0] == 'o' && isspace(line[1])) {				
 			char buf[100];
 			sscanf(line.c_str(), "%*s %s", buf);
 			string objName(buf);
 
 			// find which object we are reading
 			for(int i = 0; i < (int)ModelChess::CHESS_MODEL_OBJECTS_COUNT; i++) {
-				if((idx = objName.find(ModelChess::modelObjectNames[i])) != string::npos) {
-					//if(objName.find("_w") != string::npos)
-						modelObject = i;
-					//else if(objName.find("_b") != string::npos)
-						//modelObject = (ModelChess::CHESS_MODEL_OBJECTS / 2 + i);
+				if(objName.find(ModelChess::modelObjectNames[i]) != string::npos) {					
+					modelObject = i;					
 					
 					// choose material
 					if     (modelObject < (int)(ModelChess::CHESS_MODEL_OBJECTS_COUNT - 2) / 2)	m = matPieceW;
@@ -196,7 +199,7 @@ inline void ModelChess::load(string fileName)
 
 	// Check if all models were loaded
 	for(int i = 0; i < (int)objects_.size(); i++)
-		if(objects_.at(i).shapes.size() == 0) {
+		if(objects_.at(i).shapes.size() == 0) {			
 			cerr << "ERROR: Object " << ModelChess::modelObjectNames[i] << " missing" << endl;
 			exit(1);
 		}	
@@ -225,6 +228,10 @@ double ModelChess::calculateFieldWidth()
 	return (xMax - xMin) / 8.0;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
+//// CHESSS
+
 const int HORIZONTAL_FIELDS = 8;
 
 //! Class implements the chessboard state (configuration)
@@ -233,16 +240,9 @@ class Chess
 public:	
 	typedef ModelChess::chessModelObjects chessPieces;				
 	
-	Chess(string modelFileName) { 
-		chessModel = new ModelChess(modelFileName);	
-
-		// init configuration of chessboard
-		initPieces();
-
-		//// debug - try moving some pieces
-		//move(chessPieces::QUEEN_W, ModelChess::chessBoardCoords(7, 4));
-		//move(chessPieces::PAWN_5_B, ModelChess::chessBoardCoords(3, 5));
-		//move(chessPieces::QUEEN_B, ModelChess::chessBoardCoords(0, 5));
+	Chess(string modelFile, string configChessboardFile, string configRTFile) { 
+		chessModel = new ModelChess(modelFile);	
+		configureChessboard(configChessboardFile);				
 	}
 
 	~Chess() { 
@@ -254,12 +254,37 @@ public:
 	//! Moves the given piece to the new chessboard position.
 	/*! If the piece is not present on the chessboard, it is noop.
 	*/
-	void move(chessPieces piece, ModelChess::chessBoardCoords to);
+	void move(chessPieces piece, ModelChess::chessBoardCoords to);	
+
+	void setWhitePieceMaterial(Material* m) 
+	{
+		for(int i = 0; i < 16; i++)
+			chessModel->setObjectMaterial((ModelChess::chessModelObjects)i, m);		
+	}
+	
+	void setBlackPieceMaterial(Material* m) 
+	{
+		for(int i = 16; i < 32; i++)
+			chessModel->setObjectMaterial((ModelChess::chessModelObjects)i, m);
+	}
+	
+	void setWhiteFieldMaterial(Material* m) 
+	{
+		chessModel->setObjectMaterial((ModelChess::chessModelObjects)32, m);
+	}	
+	
+	void setBlackFieldMaterial(Material* m)
+	{
+		chessModel->setObjectMaterial((ModelChess::chessModelObjects)33, m);
+	}
 
 private:
 	//vector<ModelChess::chessBoardCoords> pieces;	// pieces' chessboard coordinates [<0;7>, <0;7>]
 	chessPieces chessBoard[HORIZONTAL_FIELDS][HORIZONTAL_FIELDS]; // 8x8 chessboard
 	ModelChess* chessModel;
+
+	//! Sets all fields of the chessboard to NO_PIECE
+	void initChessboard();
 
 	//! Initializes default positions of pieces on chessboard (assumes standard configuration at new game)
 	void initPieces();
@@ -268,6 +293,19 @@ private:
 	/*! @return pieceCoords coordinates of the piece. If not found, {-1, -1} is returned.
 	*/
 	ModelChess::chessBoardCoords pieceCoords(chessPieces piece);
+
+	//! Loads the configuration file and sets the pieces' positions accordingly
+	void configureChessboard(string fileName);
+
+	/*! Converts standard chess coordinates (e.g. F3) to C [y][x] field coords.
+		example:
+			A1 == [0][0]
+			C5 == [4][2]
+	*/
+	ModelChess::chessBoardCoords coordsChess2Carray(char letter, char number);
+
+	//! Returns the default coordinates of the given piece
+	ModelChess::chessBoardCoords pieceDefaultCoords(chessPieces piece);
 };
 
 void Chess::move(chessPieces piece, ModelChess::chessBoardCoords to)
@@ -275,10 +313,12 @@ void Chess::move(chessPieces piece, ModelChess::chessBoardCoords to)
 	/*cout << "want to: x: " << to.x << ", y: " << to.y << endl;
 	cout << "at: " << (int)chessBoard[to.y][to.x] << endl;*/
 
-	// check if there is not some piece placed already
-	if(chessBoard[to.y][to.x] == chessPieces::NO_PIECE) {
-		ModelChess::chessBoardCoords from = pieceCoords(piece);
+	ModelChess::chessBoardCoords from = pieceCoords(piece);
+	
+	if(from.x == to.x && from.y == to.y) return;
 
+	// check if there is not some piece placed already
+	if(chessBoard[to.y][to.x] == chessPieces::NO_PIECE) {		
 		// debug
 		/*cout << "from: [" << from.x << ", " << from.y << "]" <<  endl;
 		cout << "to:   [" << to.x   << ", " << to.y   << "]" <<  endl;*/
@@ -328,6 +368,89 @@ ModelChess::chessBoardCoords Chess::pieceCoords(chessPieces piece)
 			}
 
 	return coords;
+}
+
+ModelChess::chessBoardCoords Chess::pieceDefaultCoords(chessPieces piece)
+{
+	if((int)piece < 8) {
+		return ModelChess::chessBoardCoords((int)piece, 1);
+	} else if((int)piece < 16) {
+		return ModelChess::chessBoardCoords((int)piece - 8, 0);
+	} else if((int)piece < 24) {
+		return ModelChess::chessBoardCoords(24 - (int)piece - 1, 6);
+	} else {
+		return ModelChess::chessBoardCoords(32 - (int)piece - 1, 7);
+	}
+}
+
+void Chess::initChessboard()
+{
+	for(int i = 0; i < HORIZONTAL_FIELDS; i++)
+		for(int j = 0; j < HORIZONTAL_FIELDS; j++)
+			chessBoard[i][j] = ModelChess::NO_PIECE;
+}
+
+ModelChess::chessBoardCoords Chess::coordsChess2Carray(char letter, char number)
+{
+	if(!(letter >= 'A' && letter <= 'H' && number >= '1' && number <= '8')) {
+		cerr << "ERROR: wrong piece position." << endl;
+		return ModelChess::chessBoardCoords(-1, -1);
+	}
+	
+	return ModelChess::chessBoardCoords((int)(letter - 'A'), (int)(number - '1'));
+}
+
+void Chess::configureChessboard(string fileName)
+{
+	initChessboard();
+	
+	//debug
+	cout << "Loading configuration file " << fileName << "..." << endl;		
+
+	ifstream file(fileName);	
+	if(file.fail()) {
+		cerr << "ERROR: The file " << fileName << " cannot be opened." << endl;
+		exit(1);
+	}	
+			
+	string line;
+	char pieceBuf[20];
+	char positionBuf[5];	
+	int lineNum = 0;
+	while(getline(file, line)) {
+		//cout << "line: " << line << endl;
+		lineNum++;
+		if(line[0] == '#') continue;	// commentary
+		else {
+			sscanf(line.c_str(), "%s %s", pieceBuf, positionBuf);
+			string piece(pieceBuf);
+			string position(positionBuf);
+
+			// find which object we are reading
+			for(int i = 0; i < (int)ModelChess::CHESS_PIECES_COUNT; i++) {
+				if(piece.find(ModelChess::modelObjectNames[i]) != string::npos) {				
+					//cout << "found at " << i << ", line " << lineNum << endl;
+					ModelChess::chessModelObjects modelObject = (ModelChess::chessModelObjects)i;
+					//cout << "object: " << (int)modelObject << endl;
+					ModelChess::chessBoardCoords to = coordsChess2Carray(position[0], position[1]);
+					//cout << "to: " << position[0] << position[1] << " = " << "[" << to.y << "][" << to.x << "]" << endl;
+					ModelChess::chessBoardCoords from = pieceDefaultCoords(modelObject);
+					//cout << "from: " << "[" << from.y << "][" << from.x << "]" << endl;
+					chessBoard[to.y][to.x] = modelObject;
+					chessModel->move(modelObject, from, to);
+				}
+			}
+		}
+		
+		pieceBuf[0] = '\0';
+		positionBuf[0] = '\0';
+	}
+
+	// check which pieces were not set at all and set their visibility to false
+	for(int i = 0; i < (int)ModelChess::CHESS_PIECES_COUNT; i++) {
+		if(pieceCoords((Chess::chessPieces)i).x == -1)
+			chessModel->setVisibility((Chess::chessPieces)i, false);
+	}
 }
 
 #endif

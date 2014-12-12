@@ -9,43 +9,42 @@
 
 using namespace std;
 
-struct Object
+class Object
 {	
+public:
 	Object() : visible(true) { }
 	vector<Shape *> shapes;			
 	vector<Shape *> boundingBox;	
 	bool visible;
-};
-
-class Model 
-{
-public:	
-	//! Constructor
-	Model() : visible(true) { }	
-
-	//! Destructor
-	~Model() { }
-
-	/*!
-		Loads model from .OBJ file. Expects parameters v, vn, f.
-	*/
-	virtual void load(string fileName) = 0;	
 
 	//! Creates a bounding box for the given obeject - cuboid (12 triangles)
-	virtual void createBoundingBox(int objectIdx);
+	void createBoundingBox();
 
-	vector<Object> objects_;	
-	bool visible;
+	//! translates the object
+	void translate(Vector3d& t);
 };
 
-void Model::createBoundingBox(int objectIdx)
+void Object::translate(Vector3d& t)
+{
+	// move object
+	for(int i = 0; i < (int)shapes.size(); i++)
+		shapes.at(i)->translate(t);	
+
+	// recompute bounding box
+	for(int i = 0; i < (int)boundingBox.size(); i++)
+		delete boundingBox.at(i);
+	boundingBox.clear();
+	createBoundingBox();
+}
+
+void Object::createBoundingBox()
 {
 	Vector3d cmin(INFINITY, INFINITY, INFINITY);
 	Vector3d cmax(-INFINITY, -INFINITY, -INFINITY);
 
-	for(int i = 0; i < (int)objects_.at(objectIdx).shapes.size(); i++) {
-		Vector3d minTmp = objects_.at(objectIdx).shapes.at(i)->minCoords();
-		Vector3d maxTmp = objects_.at(objectIdx).shapes.at(i)->maxCoords();
+	for(int i = 0; i < (int)shapes.size(); i++) {
+		Vector3d minTmp = shapes.at(i)->minCoords();
+		Vector3d maxTmp = shapes.at(i)->maxCoords();
 
 		if(minTmp.x_ < cmin.x_) cmin.x_ = minTmp.x_;
 		if(minTmp.y_ < cmin.y_) cmin.y_ = minTmp.y_;
@@ -80,19 +79,37 @@ void Model::createBoundingBox(int objectIdx)
 	// sample normal - not used in bounding box's triangles
 	Vector3d n(1.0, 0.0, 0.0);
 
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[1], v[3], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[3], v[2], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[1], v[5], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[5], v[4], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[1], v[3], v[7], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[1], v[7], v[5], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[3], v[2], v[7], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[2], v[6], v[7], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[2], v[0], v[6], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[0], v[4], v[6], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[4], v[5], v[7], n, n, n, NULL));
-	objects_.at(objectIdx).boundingBox.push_back(new Triangle(v[4], v[7], v[6], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[0], v[1], v[3], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[0], v[3], v[2], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[0], v[1], v[5], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[0], v[5], v[4], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[1], v[3], v[7], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[1], v[7], v[5], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[3], v[2], v[7], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[2], v[6], v[7], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[2], v[0], v[6], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[0], v[4], v[6], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[4], v[5], v[7], n, n, n, NULL));
+	boundingBox.push_back(new Triangle(v[4], v[7], v[6], n, n, n, NULL));
 }
+
+class Model 
+{
+public:	
+	//! Constructor
+	Model() : visible(true) { }	
+
+	//! Destructor
+	~Model() { }
+
+	/*!
+		Loads model from .OBJ file. Expects parameters v, vn, f.
+	*/
+	virtual void load(string fileName) = 0;		
+
+	vector<Object> objects_;	
+	bool visible;
+};
 
 class ModelGeneral : public Model
 {

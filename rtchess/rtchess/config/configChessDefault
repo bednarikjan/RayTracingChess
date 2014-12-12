@@ -1,0 +1,37 @@
+# prvni pokusny konfigurak sachu
+
+# white
+pawn_1_w		A2
+pawn_2_w		B2
+pawn_3_w		C2
+pawn_4_w		D2
+pawn_5_w		E2
+pawn_6_w		F2
+pawn_7_w		G2
+pawn_8_w		H2
+rook_1_w		A1
+knight_1_w		B1
+bishop_1_w		C1
+queen_w			D1
+king_w			E1
+bishop_2_w		F1
+knight_2_w		G1
+rook_2_w		H1
+
+# black
+pawn_1_b		H7
+pawn_2_b		G7
+pawn_3_b		F7
+pawn_4_b		E7
+pawn_5_b		D7
+pawn_6_b		C7
+pawn_7_b		B7
+pawn_8_b		A7	
+rook_1_b		H8
+knight_1_b		G8
+bishop_1_b		F8
+king_b			E8
+queen_b			D8
+bishop_2_b		C8
+knight_2_b		B8
+rook_2_b		A8
