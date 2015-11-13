@@ -1,6 +1,6 @@
 # Chess renderer using ray traycing
 
-This project was the main deliverable of the winter semester course Computer graphics. The application is capable of rendering the chessboard with arbitrarily placed pieces, it uses the Phong shading model and supports shadows and reflections.
+This project was the main deliverable of the winter semester course Computer graphics. The application is capable of rendering the chessboard with arbitrarily placed pieces, it uses the Phong shading model and supports shadows and reflections. Only the .OBJ model files are supported.
 
 ## How it works?
 
@@ -12,6 +12,10 @@ Classical ray tracing approach is used. As the computation of the intersections 
 
 - MSVC compiler
 - Eigen
+
+## Configuration
+
+It is possible to set the camera's resolution and FOV, the position of the light in the scene, background color, recursion depth of ray tracing, the colors of the pieces and chessboard fields as well as the reflectance and the shininess. Regarding the chessboard model, the user can set the position of each piece. Both the renderer and the model configuration can be done using the files *configChessDefault* and *configRTDefault*. 
 
 ## Install and run
 
