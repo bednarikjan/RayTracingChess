@@ -21,7 +21,7 @@ It is possible to set the camera's resolution and FOV, the position of the light
 2. Compile (Release mode is recommended)
 3. Run (see synopses)
 
-The program uses model file chess.obj. It is possible to use your own but the program expects the separated models (chess pieces and chessboard) to follow specific name convention (see the chess.obj model file).
+The program uses free model file chess.obj (by [author cjx3711](http://www.turbosquid.com/FullPreview/Index.cfm/ID/544320)). It is possible to use your own but the program expects the separated models (chess pieces and chessboard) to follow specific name convention (see the chess.obj model file).
 
 ## Synopsis
 ```
