@@ -33,6 +33,10 @@ rtchess model config_chessboard config_ray_tracer output
      output              output file (.PPM)
 ```
 
+## Authors
+* Jan Bednarik - jan.bednarik@hotmail.cz
+* Jakub Kvita  - kvitajakub@gmail.com
+
 ## Gallery
 ![Ray traced chess 01](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/01.png)
 ![Ray traced chess 02](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/02.png)
