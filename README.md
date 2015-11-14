@@ -6,8 +6,6 @@ This project was the main deliverable of the winter semester course Computer gra
 
 Classical ray tracing approach is used. As the computation of the intersections with the model's triangles represents the most significant bottleneck of the application, the method Fast Minimum Storage Ray/Triangle Intersection was implemented. The bounding boxes are used as well.
 
- [Video stabilization](http://bednarikjan.github.io/2015/06/05/trajectory_clustering.html).
-
 ## Dependencies
 
 - MSVC compiler
@@ -19,7 +17,7 @@ It is possible to set the camera's resolution and FOV, the position of the light
 
 ## Install and run
 
-1. Open rtchess.sln
+1. Open rtchess.sln with Visual Studio
 2. Compile (Release mode is recommended)
 3. Run (see synopses)
 
@@ -36,4 +34,10 @@ rtchess model config_chessboard config_ray_tracer output
 ```
 
 ## Gallery
-![Ray traced chess 01](https://raw.github.com/username/projectname/branch/path/to/img.png)
+![Ray traced chess 01](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/01.png)
+![Ray traced chess 02](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/02.png)
+![Ray traced chess 03](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/03.png)
+![Ray traced chess 04](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/04.png)
+![Ray traced chess 05](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/05.png)
+![Ray traced chess 06](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/06.png)
+![Ray traced chess 07](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/07.png)
