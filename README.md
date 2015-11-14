@@ -26,9 +26,14 @@ It is possible to set the camera's resolution and FOV, the position of the light
 The program uses model file chess.obj. It is possible to use your own but the program expects the separated models (chess pieces and chessboard) to follow specific name convention (see the chess.obj model file).
 
 ## Synopsis
-  rtchess model config_chessboard config_ray_tracer output
-  
-    model               model file name (.OBJ)
-    config_chessboard   chessboard configuration file
-    config_ray_tracer   ray tracer configuration file
-    output              output file (.PPM)
+```
+rtchess model config_chessboard config_ray_tracer output
+
+     model               model file name (.OBJ)
+     config_chessboard   chessboard configuration file
+     config_ray_tracer   ray tracer configuration file
+     output              output file (.PPM)
+```
+
+## Gallery
+![Ray traced chess 01](https://raw.github.com/username/projectname/branch/path/to/img.png)
