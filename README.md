@@ -13,7 +13,7 @@ Classical ray tracing approach is used. As the computation of the intersections 
 
 ## Configuration
 
-It is possible to set the camera's resolution and FOV, the position of the light in the scene, background color, recursion depth of ray tracing, the colors of the pieces and chessboard fields as well as the reflectance and the shininess. Regarding the chessboard model, the user can set the position of each piece. Both the renderer and the model configuration can be done using the files *configChessDefault* and *configRTDefault*. 
+It is possible to set the camera's resolution and FOV, the position of the light in the scene, background color, recursion depth of ray tracing, the colors of the pieces and chessboard fields as well as the reflectance and the shininess. Regarding the chessboard model, the user can set the position of each piece. Both the renderer and the model configuration can be done using the files *configChessDefault* and *configRTDefault*.
 
 ## Install and run
 
@@ -38,10 +38,10 @@ rtchess model config_chessboard config_ray_tracer output
 * Jakub Kvita  - kvitajakub@gmail.com
 
 ## Gallery
-![Ray traced chess 01](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/01.png)
-![Ray traced chess 02](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/02.png)
-![Ray traced chess 03](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/03.png)
-![Ray traced chess 04](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/04.png)
-![Ray traced chess 05](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/05.png)
-![Ray traced chess 06](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/06.png)
-![Ray traced chess 07](https://raw.githubusercontent.com/bednarikjan/RayTracingChess/master/screenshots/07.png)
+![Ray traced chess 01](screenshots/01.png)
+![Ray traced chess 02](screenshots/02.png)
+![Ray traced chess 03](screenshots/03.png)
+![Ray traced chess 04](screenshots/04.png)
+![Ray traced chess 05](screenshots/05.png)
+![Ray traced chess 06](screenshots/06.png)
+![Ray traced chess 07](screenshots/07.png)
